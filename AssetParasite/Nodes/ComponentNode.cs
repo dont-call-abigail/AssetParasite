@@ -1,9 +1,7 @@
-﻿using VYaml.Annotations;
-using VYaml.Parser;
+﻿using VYaml.Parser;
 
 namespace AssetParasite;
 
-[YamlObject]
 public class ComponentNode
 {
     public record AssetReference(string guid, string memberName);
@@ -23,20 +21,28 @@ public class ComponentNode
         
         while (parser.CurrentEventType != ParseEventType.DocumentEnd)
         {
-            var key = parser.ReadScalarAsString();
-            var scalar = parser.ReadScalarAsString();
-            
-            if (key == "m_GameObject")
+            if (parser.CurrentEventType == ParseEventType.MappingStart) parser.Read();
+
+            while (parser.CurrentEventType != ParseEventType.MappingEnd)
             {
-                newNode.GameObjectFileID = RegexUtil.ParseFileId(scalar!);
+                var key = parser.ReadScalarAsString();
+                Console.WriteLine(key);
+                var scalar = parser.ReadScalarAsString();
+
+                if (key == "m_GameObject")
+                {
+                    newNode.GameObjectFileID = RegexUtil.ParseFileId(scalar!);
+                }
+
+                var potentialGuid = RegexUtil.ParseGuid(scalar);
+                if (!string.IsNullOrEmpty(potentialGuid))
+                {
+                    newNode.Assets ??= [];
+                    newNode.Assets.Add(new AssetReference(potentialGuid, key));
+                }
             }
 
-            var potentialGuid = RegexUtil.ParseGuid(scalar);
-            if (!string.IsNullOrEmpty(potentialGuid))
-            {
-                newNode.Assets ??= [];
-                newNode.Assets.Add(new AssetReference(potentialGuid, key));
-            }
+            //parser.Read();
         }
 
         return newNode;
