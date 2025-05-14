@@ -22,35 +22,34 @@ public class SceneParser
         
         while (parser.Read())
         {
-            if (parser.CurrentEventType == ParseEventType.DocumentStart)
+            if (parser.IsAt(ParseEventType.DocumentStart))
             {
                 parser.SkipAfter(ParseEventType.DocumentStart);
                 parser.TryGetCurrentAnchor(out var currentDocAnchor);
-                Console.WriteLine($"     Processing object {currentDocAnchor.Id}");
-                if (parser.CurrentEventType == ParseEventType.MappingStart)
+                if (parser.IsAt(ParseEventType.MappingStart))
                 {
                     parser.Read();
                     
                     var objectType = parser.ReadScalarAsString();
-                    Console.WriteLine(objectType);
-
+                    Console.WriteLine($"     Processing object {currentDocAnchor.Id} @ {parser.CurrentMark} (Type {objectType})");
+                    
                     switch (objectType)
                     {
                         case "GameObject":
-                            var go = GameObjectNode.ParseSelf(parser);
+                            var go = GameObjectNode.ParseSelf(ref parser);
                             assetMap.goID2GameObject.Add(currentDocAnchor.Id, go);
                             break;
                         case "MonoBehaviour":
-                            var mb = MonoBehaviourNode.ParseSelf(parser);
+                            var mb = MonoBehaviourNode.ParseSelf(ref parser);
                             RegisterComponentAssets(mb);
                             break;
                         case "Transform":
-                            var tsfm = TransformNode.ParseSelf(parser, currentDocAnchor.Id);
+                            var tsfm = TransformNode.ParseSelf(ref parser, currentDocAnchor.Id);
                             assetMap.tsfmID2Transform.Add(tsfm.FileID, tsfm);
                             assetMap.goID2Transform.Add(tsfm.GameObjectID, tsfm);
                             break;
                         default:
-                            var cn = ComponentNode.ParseSelf(parser, objectType);
+                            var cn = ComponentNode.ParseSelf(ref parser, objectType);
                             RegisterComponentAssets(cn);
                             // components without assets won't be ref'd after this point and will be GC'd
                             break;
@@ -76,6 +75,7 @@ public class SceneParser
                 {
                     assetMap.assetGuid2Component.Add(assetRef.guid, [cn]);
                 }
+                Console.WriteLine($"     FOUND: {assetRef.memberName} @ {assetRef.guid}");
             }
         } 
     } 

@@ -6,33 +6,55 @@ public class MonoBehaviourNode : ComponentNode
 {
     public string ScriptGUID;
 
-    public static MonoBehaviourNode ParseSelf(YamlParser parser)
+    public static MonoBehaviourNode ParseSelf(ref YamlParser parser)
     {
         var newNode = new MonoBehaviourNode();
         newNode.ComponentType = "MonoBehaviour";
+        newNode.Assets = [];
         
-        // duplicate code because reading from the parser moves the cursor
-        while (parser.CurrentEventType != ParseEventType.DocumentEnd)
+        while (!parser.IsAt(ParseEventType.DocumentEnd))
         {
-            var key = parser.ReadScalarAsString();
-            var scalar = parser.ReadScalarAsString();
-            
-            if (key == "m_GameObject")
+            if (parser.IsAt(ParseEventType.Scalar))
             {
-                newNode.GameObjectFileID = RegexUtil.ParseFileId(scalar!);
-            } else if (key == "m_Script")
-            {
-                newNode.ScriptGUID = RegexUtil.ParseGuid(scalar!);
+                var memberName = parser.GetScalarAsString();
+                
+                if (memberName == "m_GameObject")
+                {
+                    parser.Read();
+                    newNode.GameObjectFileID = parser.ReadFileID();
+                } else if (memberName == "m_Script")
+                {
+                    parser.Read();
+                    newNode.ScriptGUID = parser.ReadAssetGUID();
+                }
+
+                parser.Read(); // Reading manually; for some reason ReadScalar* is not moving the cursor like I thought
+                switch (parser.CurrentEventType)
+                {
+                    case ParseEventType.SequenceStart:
+                        while (!parser.End && !parser.IsAt(ParseEventType.SequenceEnd))
+                        {
+                            parser.Read();
+                            var potentialGuid = parser.ReadAssetGUID();
+                            if (!string.IsNullOrEmpty(potentialGuid))
+                            {
+                                newNode.Assets.Add(new AssetReference(potentialGuid, memberName!));
+                            }
+                        }
+                        break;
+                    case ParseEventType.MappingStart:
+                        var potentialGuid1 = parser.ReadAssetGUID();
+                        if (!string.IsNullOrEmpty(potentialGuid1))
+                        {
+                            newNode.Assets.Add(new AssetReference(potentialGuid1, memberName!));
+                        }
+                        break;
+                }
             }
 
-            var potentialGuid = RegexUtil.ParseGuid(scalar);
-            if (!string.IsNullOrEmpty(potentialGuid))
-            {
-                newNode.Assets ??= [];
-                newNode.Assets.Add(new AssetReference(potentialGuid, key));
-            }
+            parser.Read();
         }
-
+        
         return newNode;
     }
 }

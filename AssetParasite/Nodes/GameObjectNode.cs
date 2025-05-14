@@ -7,18 +7,22 @@ public class GameObjectNode
 {
     public string Name;
 
-    public static GameObjectNode ParseSelf(YamlParser parser)
+    public static GameObjectNode ParseSelf(ref YamlParser parser)
     {
         var newNode = new GameObjectNode();
-        while (parser.CurrentEventType != ParseEventType.DocumentEnd)
+        while (!parser.IsAt(ParseEventType.DocumentEnd))
         {
-            var key = parser.ReadScalarAsString();
-            var scalar = parser.ReadScalarAsString();
-
-            if (key == "m_Name")
+            if (parser.IsAt(ParseEventType.Scalar))
             {
-                newNode.Name = scalar;
+                var nameFound = parser.TryGetSpecificScalar("m_Name", out string? potentialName);
+                if (nameFound)
+                {
+                    Console.WriteLine("found name: " + potentialName);
+                    newNode.Name = potentialName!;
+                }
             }
+
+            parser.Read();
         }
 
         return newNode;

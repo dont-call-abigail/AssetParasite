@@ -2,7 +2,7 @@
 
 namespace AssetParasite;
 
-// For our purposes, Transforms are not considered Components. Their chief usage is traversal in scene hierarchies.
+// For our purposes Transforms are not considered Components. Their chief usage is traversal in scene hierarchies.
 public class TransformNode
 {
     public long FileID;
@@ -11,31 +11,43 @@ public class TransformNode
     public long Parent;
     public long[] Children;
 
-    public static TransformNode ParseSelf(YamlParser parser, long fileID)
+    public static TransformNode ParseSelf(ref YamlParser parser, long fileID)
     {
         var newNode = new TransformNode();
         newNode.FileID = fileID;
         
-        while (parser.CurrentEventType != ParseEventType.DocumentEnd)
+        while (!parser.IsAt(ParseEventType.DocumentEnd))
         {
-            var key = parser.ReadScalarAsString();
-            var scalar = parser.ReadScalarAsString();
-            
-            switch (key)
+            if (parser.IsAt(ParseEventType.Scalar))
             {
-                case "m_GameObject":
-                    newNode.GameObjectID = RegexUtil.ParseFileId(scalar);
-                    break;
-                case "m_RootOrder":
-                    newNode.RootOrder = int.Parse(scalar);
-                    break;
-                case "m_Father":
-                    newNode.Parent = RegexUtil.ParseFileId(scalar);
-                    break;
-                case "m_Children":
-                    newNode.Children = scalar.Split("-").Select(RegexUtil.ParseFileId).ToArray();
-                    break;
+                var key = parser.ReadScalarAsString();
+                switch (key)
+                {
+                    case "m_GameObject":
+                        newNode.GameObjectID = parser.ReadFileID();
+                        break;
+                    case "m_RootOrder":
+                        newNode.RootOrder = parser.ReadScalarAsInt32();
+                        break;
+                    case "m_Father":
+                        newNode.Parent = parser.ReadFileID();
+                        break;
+                    case "m_Children":
+                    {
+                        List<long> childIDs = [];
+                        while (!parser.IsAt(ParseEventType.SequenceEnd))
+                        {
+                            parser.Read();
+                            var childID = parser.ReadFileID();
+                            if (childID != -1) childIDs.Add(childID);
+                        }
+                        newNode.Children = childIDs.ToArray();
+                        break;
+                    }
+                }
             }
+
+            parser.Read();
         }
 
         return newNode;

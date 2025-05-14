@@ -1,4 +1,5 @@
-﻿using VYaml.Parser;
+﻿using System.Diagnostics;
+using VYaml.Parser;
 
 namespace AssetParasite;
 
@@ -14,35 +15,49 @@ public class ComponentNode
         return obj is ComponentNode other && other.Assets == Assets;
     }
 
-    public static ComponentNode ParseSelf(YamlParser parser, string componentType)
+    public static ComponentNode ParseSelf(ref YamlParser parser, string componentType)
     {
         var newNode = new ComponentNode();
         newNode.ComponentType = componentType;
-        
-        while (parser.CurrentEventType != ParseEventType.DocumentEnd)
+        newNode.Assets = [];
+
+        while (!parser.IsAt(ParseEventType.DocumentEnd))
         {
-            if (parser.CurrentEventType == ParseEventType.MappingStart) parser.Read();
-
-            while (parser.CurrentEventType != ParseEventType.MappingEnd)
+            if (parser.IsAt(ParseEventType.Scalar))
             {
-                var key = parser.ReadScalarAsString();
-                Console.WriteLine(key);
-                var scalar = parser.ReadScalarAsString();
+                var memberName = parser.GetScalarAsString();
 
-                if (key == "m_GameObject")
+                if (memberName == "m_GameObject")
                 {
-                    newNode.GameObjectFileID = RegexUtil.ParseFileId(scalar!);
+                    parser.Read();
+                    newNode.GameObjectFileID = parser.ReadFileID();
                 }
 
-                var potentialGuid = RegexUtil.ParseGuid(scalar);
-                if (!string.IsNullOrEmpty(potentialGuid))
+                parser.Read();
+                switch (parser.CurrentEventType)
                 {
-                    newNode.Assets ??= [];
-                    newNode.Assets.Add(new AssetReference(potentialGuid, key));
+                    case ParseEventType.SequenceStart:
+                        while (!parser.End && !parser.IsAt(ParseEventType.SequenceEnd))
+                        {
+                            parser.Read();
+                            var potentialGuid = parser.ReadAssetGUID();
+                            if (!string.IsNullOrEmpty(potentialGuid))
+                            {
+                                newNode.Assets.Add(new AssetReference(potentialGuid, memberName));
+                            }
+                        }
+                        break;
+                    case ParseEventType.MappingStart:
+                        var potentialGuid1 = parser.ReadAssetGUID();
+                        if (!string.IsNullOrEmpty(potentialGuid1))
+                        {
+                            newNode.Assets.Add(new AssetReference(potentialGuid1, memberName));
+                        }
+                        break;
                 }
             }
 
-            //parser.Read();
+            parser.Read();
         }
 
         return newNode;
