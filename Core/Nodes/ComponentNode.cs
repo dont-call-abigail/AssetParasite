@@ -9,6 +9,7 @@ public class ComponentNode
     public List<AssetReference> Assets;
     public string ComponentType;
     public long GameObjectFileID;
+    // todo: sequence index
 
     public override bool Equals(object? obj)
     {

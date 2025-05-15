@@ -1,4 +1,5 @@
 ﻿using System.Text;
+using Manifest;
 
 namespace Core;
 
@@ -19,12 +20,12 @@ public class SceneAssetReferenceMap
         tsfmID2Transform = [];
     }
 
-    public bool SceneContainsAsset(string assetGuid)
+    public bool ContainsAsset(string assetGuid)
     {
         return assetGuid2Component.ContainsKey(assetGuid);
     }
 
-    public string ResolveHierarchyPath(long goID)
+    public (string goName, string tsfmPath) ResolveHierarchyPath(long goID)
     {
         StringBuilder sb = new StringBuilder();
         TransformNode currNode = goID2Transform[goID];
@@ -38,12 +39,11 @@ public class SceneAssetReferenceMap
         }
 
         var rootGO = goID2GameObject[currNode.GameObjectID];
-        sb.Insert(0, $"{rootGO.Name};");
 
-        return sb.ToString();
+        return (rootGO.Name, sb.ToString());
     }
 
-    public string ResolveComponentAssetPath(string assetGuid, ComponentNode component)
+    public SceneDresserManifest.ManifestComponentData ResolveComponentData(string assetGuid, ComponentNode component)
     {
         var foundRecord = component.Assets.FindAll(refr => refr.guid == assetGuid);
         if (foundRecord.Count > 1)
@@ -52,17 +52,48 @@ public class SceneAssetReferenceMap
         }
         if (foundRecord.Count == 0)
         {
-            return "";
+            throw new Exception($"There are no assets for GUID {assetGuid} in scene {sceneName}");
         }
+
+        var componentData = new SceneDresserManifest.ManifestComponentData
+        {
+            ComponentType = component.ComponentType,
+            MemberName = foundRecord[0].memberName
+        };
         
         if (component is MonoBehaviourNode scriptNode)
         {
-            return $"{scriptNode.ComponentType};{foundRecord[0].memberName};{scriptNode.ScriptGUID}";
+            componentData.ScriptGuid = scriptNode.ScriptGUID;
         }
-        else
+
+        return componentData;
+    }
+
+    public List<SceneDresserManifest.ManifestAssetPath>? CreateManifestEntry(string guid)
+    {
+        if (!ContainsAsset(guid))
         {
-            return $"{component.ComponentType};{foundRecord[0].memberName}";
+            return null;
         }
+
+        var manifestPaths = new List<SceneDresserManifest.ManifestAssetPath>();
+        var foundAssets = assetGuid2Component[guid];
+        
+        foreach (var component in foundAssets)
+        {
+            var componentData = ResolveComponentData(guid, component);
+            var hierarchyPath = ResolveHierarchyPath(component.GameObjectFileID);
+
+            manifestPaths.Add(new SceneDresserManifest.ManifestAssetPath
+            {
+                SceneName = sceneName,
+                Component = componentData,
+                TransformPath = hierarchyPath.tsfmPath,
+                BaseGameObject = hierarchyPath.goName
+            });
+        }
+        
+        return manifestPaths;
     }
 
 }
