@@ -1,10 +1,10 @@
 ﻿// See https://aka.ms/new-console-template for more information
 
-using AssetParasite;
+using Core;
 using Newtonsoft.Json;
 
 Console.WriteLine("Hello, World!");
-string sceneFolder = @"C:\Users\jack\Downloads\RippedDisco\ExportedProject\Assets\Scenes";
+string sceneFolder = @"D:\Projects\DCA\RippedDisco\ExportedProject\Assets\Scenes";
 
 // potential args: required scene assets refs vs all assets, scene folder
 

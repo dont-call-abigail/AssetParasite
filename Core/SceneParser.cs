@@ -1,6 +1,6 @@
 ﻿using VYaml.Parser;
 
-namespace AssetParasite;
+namespace Core;
 
 public class SceneParser
 {
@@ -16,40 +16,40 @@ public class SceneParser
     public SceneAssetReferenceMap BuildAssetReferenceMap()
     {
         var sceneBytes = File.ReadAllBytes(scenePath);
-        var parser = YamlParser.FromBytes(sceneBytes);
+        var cursor = YamlParser.FromBytes(sceneBytes);
         
         Console.WriteLine($"Parsing scene {Path.GetFileName(scenePath)}");
         
-        while (parser.Read())
+        while (cursor.Read())
         {
-            if (parser.IsAt(ParseEventType.DocumentStart))
+            if (cursor.IsAt(ParseEventType.DocumentStart))
             {
-                parser.SkipAfter(ParseEventType.DocumentStart);
-                parser.TryGetCurrentAnchor(out var currentDocAnchor);
-                if (parser.IsAt(ParseEventType.MappingStart))
+                cursor.SkipAfter(ParseEventType.DocumentStart);
+                cursor.TryGetCurrentAnchor(out var currentDocAnchor);
+                if (cursor.IsAt(ParseEventType.MappingStart))
                 {
-                    parser.Read();
+                    cursor.Read();
                     
-                    var objectType = parser.ReadScalarAsString();
-                    Console.WriteLine($"     Processing object {currentDocAnchor.Id} @ {parser.CurrentMark} (Type {objectType})");
+                    var objectType = cursor.ReadScalarAsString();
+                    Console.WriteLine($"     Processing object {currentDocAnchor.Id} @ {cursor.CurrentMark} (Type {objectType})");
                     
                     switch (objectType)
                     {
                         case "GameObject":
-                            var go = GameObjectNode.ParseSelf(ref parser);
+                            var go = GameObjectNode.ParseSelf(ref cursor);
                             assetMap.goID2GameObject.Add(currentDocAnchor.Id, go);
                             break;
                         case "MonoBehaviour":
-                            var mb = MonoBehaviourNode.ParseSelf(ref parser);
+                            var mb = MonoBehaviourNode.ParseSelf(ref cursor);
                             RegisterComponentAssets(mb);
                             break;
                         case "Transform":
-                            var tsfm = TransformNode.ParseSelf(ref parser, currentDocAnchor.Id);
+                            var tsfm = TransformNode.ParseSelf(ref cursor, currentDocAnchor.Id);
                             assetMap.tsfmID2Transform.Add(tsfm.FileID, tsfm);
                             assetMap.goID2Transform.Add(tsfm.GameObjectID, tsfm);
                             break;
                         default:
-                            var cn = ComponentNode.ParseSelf(ref parser, objectType);
+                            var cn = ComponentNode.ParseSelf(ref cursor, objectType);
                             RegisterComponentAssets(cn);
                             // components without assets won't be ref'd after this point and will be GC'd
                             break;

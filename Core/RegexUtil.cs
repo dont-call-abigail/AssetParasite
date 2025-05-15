@@ -1,6 +1,6 @@
 ﻿using System.Text.RegularExpressions;
 
-namespace AssetParasite;
+namespace Core;
 
 public static partial class RegexUtil
 {

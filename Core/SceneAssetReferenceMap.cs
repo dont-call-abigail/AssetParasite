@@ -1,6 +1,6 @@
 ﻿using System.Text;
 
-namespace AssetParasite;
+namespace Core;
 
 public class SceneAssetReferenceMap
 {

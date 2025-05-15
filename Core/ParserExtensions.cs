@@ -1,6 +1,6 @@
 ﻿using VYaml.Parser;
 
-namespace AssetParasite;
+namespace Core;
 
 public static class ParserExtensions
 {

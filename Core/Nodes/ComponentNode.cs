@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics;
 using VYaml.Parser;
 
-namespace AssetParasite;
+namespace Core;
 
 public class ComponentNode
 {

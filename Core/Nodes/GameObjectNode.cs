@@ -1,7 +1,7 @@
 ﻿
 using VYaml.Parser;
 
-namespace AssetParasite;
+namespace Core;
 
 public class GameObjectNode
 {

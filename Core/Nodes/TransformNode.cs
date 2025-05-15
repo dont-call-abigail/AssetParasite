@@ -1,6 +1,6 @@
 ﻿using VYaml.Parser;
 
-namespace AssetParasite;
+namespace Core;
 
 // For our purposes Transforms are not considered Components. Their chief usage is traversal in scene hierarchies.
 public class TransformNode
@@ -11,34 +11,34 @@ public class TransformNode
     public long Parent;
     public long[] Children;
 
-    public static TransformNode ParseSelf(ref YamlParser parser, long fileID)
+    public static TransformNode ParseSelf(ref YamlParser cursor, long fileID)
     {
         var newNode = new TransformNode();
         newNode.FileID = fileID;
         
-        while (!parser.IsAt(ParseEventType.DocumentEnd))
+        while (!cursor.IsAt(ParseEventType.DocumentEnd))
         {
-            if (parser.IsAt(ParseEventType.Scalar))
+            if (cursor.IsAt(ParseEventType.Scalar))
             {
-                var key = parser.ReadScalarAsString();
+                var key = cursor.ReadScalarAsString();
                 switch (key)
                 {
                     case "m_GameObject":
-                        newNode.GameObjectID = parser.ReadFileID();
+                        newNode.GameObjectID = cursor.ReadFileID();
                         break;
                     case "m_RootOrder":
-                        newNode.RootOrder = parser.ReadScalarAsInt32();
+                        newNode.RootOrder = cursor.ReadScalarAsInt32();
                         break;
                     case "m_Father":
-                        newNode.Parent = parser.ReadFileID();
+                        newNode.Parent = cursor.ReadFileID();
                         break;
                     case "m_Children":
                     {
                         List<long> childIDs = [];
-                        while (!parser.IsAt(ParseEventType.SequenceEnd))
+                        while (!cursor.IsAt(ParseEventType.SequenceEnd))
                         {
-                            parser.Read();
-                            var childID = parser.ReadFileID();
+                            cursor.Read();
+                            var childID = cursor.ReadFileID();
                             if (childID != -1) childIDs.Add(childID);
                         }
                         newNode.Children = childIDs.ToArray();
@@ -47,7 +47,7 @@ public class TransformNode
                 }
             }
 
-            parser.Read();
+            cursor.Read();
         }
 
         return newNode;
