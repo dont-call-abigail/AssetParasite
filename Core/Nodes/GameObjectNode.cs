@@ -17,7 +17,6 @@ public class GameObjectNode
                 var nameFound = parser.TryGetSpecificScalar("m_Name", out string? potentialName);
                 if (nameFound)
                 {
-                    Console.WriteLine("found name: " + potentialName);
                     newNode.Name = potentialName!;
                 }
             }

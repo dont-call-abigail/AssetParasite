@@ -94,4 +94,11 @@ public static class ParserExtensions
     {
         return parser.CurrentEventType == type;
     }
+    
+    public static void PrintBlock(byte[] bytes, int idx, int offset)
+    {
+        var caughtBytes = new byte[Math.Abs(offset) + 1];
+        Buffer.BlockCopy(bytes, offset > 0 ? idx : idx - offset, caughtBytes, 0, Math.Abs(offset));
+        Console.WriteLine($"[{System.Text.Encoding.UTF8.GetString(caughtBytes)}]");
+    }
 }

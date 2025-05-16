@@ -31,6 +31,7 @@ public class ComponentNode
                 if (memberName == "m_GameObject")
                 {
                     parser.Read();
+                    // nts: sometimes is 0, causes problems later.
                     newNode.GameObjectFileID = parser.ReadFileID();
                 }
 

@@ -27,15 +27,15 @@ public class SceneAssetReferenceMap
 
     public (string goName, string tsfmPath) ResolveHierarchyPath(long goID)
     {
+        if (goID == 0) return ("", "");
         StringBuilder sb = new StringBuilder();
         TransformNode currNode = goID2Transform[goID];
-        var parent = tsfmID2Transform[currNode.Parent];
 
-        while (parent.FileID != 0)
+        while (currNode.Parent != 0)
         {
-            sb.Insert(0, $"{parent.RootOrder};");
-            currNode = tsfmID2Transform[currNode.Parent];
-            parent = tsfmID2Transform[currNode.Parent];
+            var tsfm = tsfmID2Transform[currNode.Parent];
+            sb.Insert(0, $"{tsfm.RootOrder};");
+            currNode = tsfm;
         }
 
         var rootGO = goID2GameObject[currNode.GameObjectID];
