@@ -2,7 +2,7 @@
 
 namespace Core;
 
-public class AssetLocationManifest
+public class ManifestGenerator
 {
     public static SceneDresserManifest GenerateManifest(string[] assetGuids, SceneAssetReferenceMap[] scenes)
     {

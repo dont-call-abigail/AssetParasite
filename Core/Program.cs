@@ -1,5 +1,6 @@
 ﻿// See https://aka.ms/new-console-template for more information
 
+using System.Text.Json;
 using Core;
 using Newtonsoft.Json;
 
@@ -22,5 +23,5 @@ foreach (var asset in sceneAssets)
     File.WriteAllText(path, JsonConvert.SerializeObject(asset));
 }
 
-var manifest = AssetLocationManifest.GenerateAllAssetManifest(sceneAssets.ToArray());
-File.WriteAllText($"{sceneFolder}/scene_dresser_manifest.assetmap", JsonConvert.SerializeObject(manifest, Formatting.Indented));
+var manifest = ManifestGenerator.GenerateAllAssetManifest(sceneAssets.ToArray());
+File.WriteAllText($"{sceneFolder}/scene_dresser_manifest.assetmap", System.Text.Json.JsonSerializer.Serialize(manifest, new JsonSerializerOptions(){WriteIndented = true}));

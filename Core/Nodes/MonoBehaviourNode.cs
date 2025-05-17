@@ -4,6 +4,8 @@ namespace Core;
 
 public class MonoBehaviourNode : ComponentNode
 {
+    // Technically we could figure out the script name/type from the Guid.
+    // To avoid recreating the wheel we'll leave that step to Unity's AssetDatabase.
     public string ScriptGUID;
 
     public static MonoBehaviourNode ParseSelf(ref YamlParser parser)

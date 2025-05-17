@@ -19,13 +19,39 @@ public class SceneAssetReferenceMap
         assetGuid2Component = [];
         tsfmID2Transform = [];
     }
+    
+    public List<SceneDresserManifest.ManifestAssetPath>? CreateManifestEntry(string guid)
+    {
+        if (!ContainsAsset(guid))
+        {
+            return null;
+        }
+
+        var manifestPaths = new List<SceneDresserManifest.ManifestAssetPath>();
+        var foundAssets = assetGuid2Component[guid];
+        
+        foreach (var component in foundAssets.Take(Config.MaxAssetPathsIncludedPerScene))
+        {
+            var componentData = ResolveComponentData(guid, component);
+            var hierarchyPath = ResolveHierarchyPath(component.GameObjectFileID);
+
+            manifestPaths.Add(new SceneDresserManifest.ManifestAssetPath
+            {
+                Component = componentData,
+                TransformPath = hierarchyPath.tsfmPath,
+                BaseGameObject = hierarchyPath.goName
+            });
+        }
+        
+        return manifestPaths;
+    }
 
     public bool ContainsAsset(string assetGuid)
     {
         return assetGuid2Component.ContainsKey(assetGuid);
     }
 
-    public (string goName, string tsfmPath) ResolveHierarchyPath(long goID)
+    private (string goName, string tsfmPath) ResolveHierarchyPath(long goID)
     {
         if (goID == 0) return ("", "");
         StringBuilder sb = new StringBuilder();
@@ -33,9 +59,9 @@ public class SceneAssetReferenceMap
 
         while (currNode.Parent != 0)
         {
-            var tsfm = tsfmID2Transform[currNode.Parent];
-            sb.Insert(0, $"{tsfm.RootOrder};");
-            currNode = tsfm;
+            if (sb.Length >= 1) sb.Insert(0, ';');
+            sb.Insert(0, $"{currNode.RootOrder}");
+            currNode = tsfmID2Transform[currNode.Parent];
         }
 
         var rootGO = goID2GameObject[currNode.GameObjectID];
@@ -43,7 +69,7 @@ public class SceneAssetReferenceMap
         return (rootGO.Name, sb.ToString());
     }
 
-    public SceneDresserManifest.ManifestComponentData ResolveComponentData(string assetGuid, ComponentNode component)
+    private SceneDresserManifest.ManifestComponentData ResolveComponentData(string assetGuid, ComponentNode component)
     {
         var foundRecord = component.Assets.FindAll(refr => refr.Guid == assetGuid);
         if (foundRecord.Count > 1)
@@ -68,33 +94,6 @@ public class SceneAssetReferenceMap
         }
 
         return componentData;
-    }
-
-    public List<SceneDresserManifest.ManifestAssetPath>? CreateManifestEntry(string guid)
-    {
-        if (!ContainsAsset(guid))
-        {
-            return null;
-        }
-
-        var manifestPaths = new List<SceneDresserManifest.ManifestAssetPath>();
-        var foundAssets = assetGuid2Component[guid];
-        
-        foreach (var component in foundAssets.Take(Config.MaxAssetPathsIncludedPerScene))
-        {
-            var componentData = ResolveComponentData(guid, component);
-            var hierarchyPath = ResolveHierarchyPath(component.GameObjectFileID);
-
-            manifestPaths.Add(new SceneDresserManifest.ManifestAssetPath
-            {
-                SceneName = sceneName,
-                Component = componentData,
-                TransformPath = hierarchyPath.tsfmPath,
-                BaseGameObject = hierarchyPath.goName
-            });
-        }
-        
-        return manifestPaths;
     }
 
 }
