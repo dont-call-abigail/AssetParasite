@@ -37,6 +37,7 @@ public class SceneAssetReferenceMap
 
             manifestPaths.Add(new SceneDresserManifest.ManifestAssetPath
             {
+                SceneName = sceneName,
                 Component = componentData,
                 TransformPath = hierarchyPath.tsfmPath,
                 BaseGameObject = hierarchyPath.goName

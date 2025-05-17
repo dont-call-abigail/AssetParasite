@@ -8,6 +8,7 @@ public sealed class SceneDresserManifest
     [Serializable]
     public sealed class ManifestAssetPath
     {
+        public string SceneName { get; set; }
         public string BaseGameObject { get; set; }
         public string TransformPath { get; set; }
         public ManifestComponentData Component { get; set; }
