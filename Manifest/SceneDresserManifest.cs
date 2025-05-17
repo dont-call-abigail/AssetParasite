@@ -1,4 +1,6 @@
-﻿namespace Manifest;
+﻿using System.Text.Json.Serialization;
+
+namespace Manifest;
 
 public sealed class SceneDresserManifest
 {
@@ -12,9 +14,11 @@ public sealed class SceneDresserManifest
 
     public struct ManifestComponentData
     {
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public string ScriptGuid;
         public string ComponentType;
         public string MemberName;
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public int CollectionIndex;
     }
 

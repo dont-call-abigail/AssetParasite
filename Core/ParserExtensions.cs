@@ -49,7 +49,7 @@ public static class ParserExtensions
                 else if (parser.IsAt(ParseEventType.Scalar))
                 {
                     var value = parser.ReadScalarAsString();
-                    if (key == "guid")
+                    if (key == "guid" && !Config.ExcludedAssets.Contains(value))
                     {
                         return value;
                     }
@@ -59,8 +59,6 @@ public static class ParserExtensions
                     return null;
                 }
             }
-
-            parser.Read();
         }
 
         return null;

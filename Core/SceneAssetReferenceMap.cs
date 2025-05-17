@@ -45,7 +45,7 @@ public class SceneAssetReferenceMap
 
     public SceneDresserManifest.ManifestComponentData ResolveComponentData(string assetGuid, ComponentNode component)
     {
-        var foundRecord = component.Assets.FindAll(refr => refr.guid == assetGuid);
+        var foundRecord = component.Assets.FindAll(refr => refr.Guid == assetGuid);
         if (foundRecord.Count > 1)
         {
             Console.WriteLine($"WARNING: Found multiple refs for asset {assetGuid} on {component} (of {goID2GameObject[component.GameObjectFileID].Name})");
@@ -58,7 +58,8 @@ public class SceneAssetReferenceMap
         var componentData = new SceneDresserManifest.ManifestComponentData
         {
             ComponentType = component.ComponentType,
-            MemberName = foundRecord[0].memberName
+            MemberName = foundRecord[0].MemberName,
+            CollectionIndex = foundRecord[0].CollectionIndex
         };
         
         if (component is MonoBehaviourNode scriptNode)
@@ -79,7 +80,7 @@ public class SceneAssetReferenceMap
         var manifestPaths = new List<SceneDresserManifest.ManifestAssetPath>();
         var foundAssets = assetGuid2Component[guid];
         
-        foreach (var component in foundAssets)
+        foreach (var component in foundAssets.Take(Config.MaxAssetPathsIncludedPerScene))
         {
             var componentData = ResolveComponentData(guid, component);
             var hierarchyPath = ResolveHierarchyPath(component.GameObjectFileID);

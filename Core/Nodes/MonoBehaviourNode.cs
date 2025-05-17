@@ -16,37 +16,36 @@ public class MonoBehaviourNode : ComponentNode
         {
             if (parser.IsAt(ParseEventType.Scalar))
             {
-                var memberName = parser.GetScalarAsString();
-                
+                var memberName = parser.ReadScalarAsString();
+                                
                 if (memberName == "m_GameObject")
                 {
-                    parser.Read();
                     newNode.GameObjectFileID = parser.ReadFileID();
                 } else if (memberName == "m_Script")
                 {
-                    parser.Read();
                     newNode.ScriptGUID = parser.ReadAssetGUID();
                 }
 
-                parser.Read(); // Reading manually; for some reason ReadScalar* is not moving the cursor like I thought
                 switch (parser.CurrentEventType)
                 {
                     case ParseEventType.SequenceStart:
+                        int index = 0;
                         while (!parser.End && !parser.IsAt(ParseEventType.SequenceEnd))
                         {
                             parser.Read();
                             var potentialGuid = parser.ReadAssetGUID();
                             if (!string.IsNullOrEmpty(potentialGuid))
                             {
-                                newNode.Assets.Add(new AssetReference(potentialGuid, memberName!));
+                                newNode.Assets.Add(new AssetReference(potentialGuid, memberName!, index));
                             }
+                            index++;
                         }
                         break;
                     case ParseEventType.MappingStart:
                         var potentialGuid1 = parser.ReadAssetGUID();
                         if (!string.IsNullOrEmpty(potentialGuid1))
                         {
-                            newNode.Assets.Add(new AssetReference(potentialGuid1, memberName!));
+                            newNode.Assets.Add(new AssetReference(potentialGuid1, memberName!, 0));
                         }
                         break;
                 }

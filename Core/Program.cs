@@ -4,7 +4,7 @@ using Core;
 using Newtonsoft.Json;
 
 Console.WriteLine("Hello, World!");
-string sceneFolder = @"C:\Users\jack\Downloads\4eeeeee\ExportedProject\Assets\Scenes";
+string sceneFolder = @"C:\Users\jack\Downloads\RippedDisco\ExportedProject\Assets\Scenes";
 
 // potential args: required scene assets refs vs all assets, scene folder
 
@@ -23,4 +23,4 @@ foreach (var asset in sceneAssets)
 }
 
 var manifest = AssetLocationManifest.GenerateAllAssetManifest(sceneAssets.ToArray());
-File.WriteAllText($"{sceneFolder}/scene_dresser_manifest.assetmap", JsonConvert.SerializeObject(manifest));
+File.WriteAllText($"{sceneFolder}/scene_dresser_manifest.assetmap", JsonConvert.SerializeObject(manifest, Formatting.Indented));

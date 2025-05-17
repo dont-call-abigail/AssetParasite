@@ -25,7 +25,7 @@ public class SceneParser
         {
             if (cursor.IsAt(ParseEventType.DocumentStart))
             {
-                ParserExtensions.PrintBlock(sceneBytes,cursor.CurrentMark.Position + 1, 4);
+                //ParserExtensions.PrintBlock(sceneBytes,cursor.CurrentMark.Position + 1, 4);
                 long currentAnchor = DecipherAnchor(sceneBytes, cursor.CurrentMark.Position + 2);
                 cursor.SkipAfter(ParseEventType.DocumentStart);
                 if (cursor.IsAt(ParseEventType.MappingStart))
@@ -45,7 +45,7 @@ public class SceneParser
                             var mb = MonoBehaviourNode.ParseSelf(ref cursor);
                             RegisterComponentAssets(mb);
                             break;
-                        case "Transform":
+                        case "Transform" or "RectTransform":
                             var tsfm = TransformNode.ParseSelf(ref cursor, currentAnchor);
                             assetMap.tsfmID2Transform.Add(tsfm.FileID, tsfm);
                             assetMap.goID2Transform.Add(tsfm.GameObjectID, tsfm);
@@ -65,12 +65,20 @@ public class SceneParser
 
     private long DecipherAnchor(byte[] source, int sourceIdx)
     {
-        byte[] caughtBytes = new byte[10];
-        Array.Copy(source, sourceIdx, caughtBytes, 0, 10);
-        string intStr = System.Text.Encoding.UTF8.GetString(caughtBytes);
-        var anchor = int.Parse(intStr.Split('\n')[0].Split(' ')[0]);
+        byte[] caughtBytes = new byte[13];
+        Array.Copy(source, sourceIdx, caughtBytes, 0, 13);
+        Span<char> intStr = System.Text.Encoding.UTF8.GetChars(caughtBytes).AsSpan();
+        int numberEndIdx = 0;
+        for (int i = 0; i < intStr.Length; i++)
+        {
+            if (!char.IsNumber(intStr[i]))
+            {
+                numberEndIdx = i;
+                break;
+            }
+        }
 
-        return anchor;
+        return int.Parse(intStr[..numberEndIdx]);;
     }
 
     private void RegisterComponentAssets(ComponentNode cn)
@@ -79,15 +87,15 @@ public class SceneParser
         {
             foreach (var assetRef in cn.Assets)
             {
-                if (assetMap.assetGuid2Component.TryGetValue(assetRef.guid, out var value))
+                if (assetMap.assetGuid2Component.TryGetValue(assetRef.Guid, out var value))
                 {
                     value.Add(cn);
                 }
                 else
                 {
-                    assetMap.assetGuid2Component.Add(assetRef.guid, [cn]);
+                    assetMap.assetGuid2Component.Add(assetRef.Guid, [cn]);
                 }
-                Console.WriteLine($"     FOUND: {assetRef.memberName} @ {assetRef.guid}");
+                Console.WriteLine($"     FOUND: {assetRef.MemberName} @ {assetRef.Guid}");
             }
         } 
     }

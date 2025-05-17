@@ -5,11 +5,10 @@ namespace Core;
 
 public class ComponentNode
 {
-    public record AssetReference(string guid, string memberName);
+    public record AssetReference(string Guid, string MemberName, int CollectionIndex);
     public List<AssetReference> Assets;
     public string ComponentType;
     public long GameObjectFileID;
-    // todo: sequence index
 
     public override bool Equals(object? obj)
     {
@@ -26,34 +25,33 @@ public class ComponentNode
         {
             if (parser.IsAt(ParseEventType.Scalar))
             {
-                var memberName = parser.GetScalarAsString();
+                var memberName = parser.ReadScalarAsString();
 
                 if (memberName == "m_GameObject")
                 {
-                    parser.Read();
-                    // nts: sometimes is 0, causes problems later.
                     newNode.GameObjectFileID = parser.ReadFileID();
                 }
-
-                parser.Read();
+                
                 switch (parser.CurrentEventType)
                 {
                     case ParseEventType.SequenceStart:
+                        int index = 0;
                         while (!parser.End && !parser.IsAt(ParseEventType.SequenceEnd))
                         {
                             parser.Read();
                             var potentialGuid = parser.ReadAssetGUID();
                             if (!string.IsNullOrEmpty(potentialGuid))
                             {
-                                newNode.Assets.Add(new AssetReference(potentialGuid, memberName));
+                                newNode.Assets.Add(new AssetReference(potentialGuid, memberName, index));
                             }
+                            index++;
                         }
                         break;
                     case ParseEventType.MappingStart:
                         var potentialGuid1 = parser.ReadAssetGUID();
                         if (!string.IsNullOrEmpty(potentialGuid1))
                         {
-                            newNode.Assets.Add(new AssetReference(potentialGuid1, memberName));
+                            newNode.Assets.Add(new AssetReference(potentialGuid1, memberName, 0));
                         }
                         break;
                 }

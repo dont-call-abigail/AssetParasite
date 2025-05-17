@@ -1,0 +1,12 @@
+﻿namespace Core;
+
+public static class Config
+{
+    public static HashSet<string> ExcludedAssets =
+    [
+        "0000000000000000f000000000000000",
+        "0000000000000000e000000000000000"
+    ];
+
+    public const int MaxAssetPathsIncludedPerScene = 2;
+}
