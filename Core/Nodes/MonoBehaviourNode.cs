@@ -26,6 +26,10 @@ public class MonoBehaviourNode : ComponentNode
                 } else if (memberName == "m_Script")
                 {
                     newNode.ScriptGUID = parser.ReadAssetGUID();
+                    if (Config.Guid2ScriptName.TryGetValue(newNode.ScriptGUID, out var type))
+                    {
+                        newNode.ComponentType = type;
+                    }
                 }
 
                 switch (parser.CurrentEventType)
