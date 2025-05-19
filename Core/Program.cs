@@ -11,25 +11,31 @@ namespace Core
             {
                 Console.WriteLine(Config.HelpMessage);
                 return;
+            } 
+            
+            if (args.Length == 1)
+            {
+                string lonelyArg = args[0];
+                if (lonelyArg is "--help" or "-h")
+                {
+                    Console.WriteLine(Config.HelpMessage);
+                    return;
+                }
+                if (lonelyArg is "--version" or "-v")
+                {
+                    Console.WriteLine(Assembly.GetEntryAssembly().GetName().Version);
+                    return;
+                }
             }
 
             string sceneFolderPath = args[0];
             string[]? assetGuids = null;
             string? outputPath = null;
             
-            int i = 1;
-            for (; i < args.Length; i++)
+            for (int i = 1; i < args.Length; i++)
             {
                 var arg = args[i];
-                if (arg is "--help" or "-h" || args.Length < 2)
-                {
-                    Console.WriteLine(Config.HelpMessage);
-                    return;
-                } else if (arg is "--version" or "-v")
-                {
-                    Console.WriteLine(Assembly.GetEntryAssembly().GetName().Version);
-                    return;
-                } else if (arg is "--exclude-assets" or "-a")
+                if (arg is "--exclude-assets" or "-a")
                 {
                     var excludeAssets = args[++i].Split(',');
                     foreach (var assetId in excludeAssets)

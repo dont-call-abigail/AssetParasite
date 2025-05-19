@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace Manifest;
+namespace Schema;
 
 [Serializable]
 public sealed class SceneDresserManifest

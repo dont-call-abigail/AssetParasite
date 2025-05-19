@@ -1,4 +1,4 @@
-﻿using Manifest;
+﻿using Schema;
 
 namespace Core;
 

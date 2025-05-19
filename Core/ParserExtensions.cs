@@ -1,4 +1,5 @@
-﻿using VYaml.Parser;
+﻿using System.Text;
+using VYaml.Parser;
 
 namespace Core;
 
@@ -97,6 +98,6 @@ public static class ParserExtensions
     {
         var caughtBytes = new byte[Math.Abs(offset) + 1];
         Buffer.BlockCopy(bytes, offset > 0 ? idx : idx - offset, caughtBytes, 0, Math.Abs(offset));
-        Console.WriteLine($"[{System.Text.Encoding.UTF8.GetString(caughtBytes)}]");
+        Console.WriteLine($"[{Encoding.UTF8.GetString(caughtBytes)}]");
     }
 }

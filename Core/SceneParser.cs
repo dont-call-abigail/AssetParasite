@@ -67,7 +67,7 @@ public class SceneParser
     {
         byte[] caughtBytes = new byte[Config.AnchorByteBufferSize];
         Array.Copy(source, sourceIdx, caughtBytes, 0, Config.AnchorByteBufferSize);
-        Span<char> intStr = System.Text.Encoding.UTF8.GetChars(caughtBytes).AsSpan();
+        Span<char> intStr = Encoding.UTF8.GetChars(caughtBytes).AsSpan();
         int numberEndIdx = 0;
         for (int i = 0; i < intStr.Length; i++)
         {
