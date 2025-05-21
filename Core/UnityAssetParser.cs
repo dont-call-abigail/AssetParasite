@@ -3,23 +3,23 @@ using VYaml.Parser;
 
 namespace Core;
 
-public class SceneParser
+public class UnityAssetParser
 {
-    private string scenePath;
-    private SceneAssetReferenceMap assetMap;
+    private string assetPath;
+    private AssetReferenceMap assetMap;
 
-    public SceneParser(string path)
+    public UnityAssetParser(string path)
     {
-        scenePath = path;
-        assetMap = new SceneAssetReferenceMap(Path.GetFileName(scenePath));
+        assetPath = path;
+        assetMap = new AssetReferenceMap(Path.GetFileName(assetPath));
     }
 
-    public SceneAssetReferenceMap BuildAssetReferenceMap()
+    public AssetReferenceMap BuildAssetReferenceMap()
     {
-        var sceneBytes = File.ReadAllBytes(scenePath);
+        var sceneBytes = File.ReadAllBytes(assetPath);
         var cursor = YamlParser.FromBytes(sceneBytes);
         
-        Console.WriteLine($"Parsing scene {Path.GetFileName(scenePath)}");
+        Console.WriteLine($"Parsing scene {Path.GetFileName(assetPath)}");
         
         while (cursor.Read())
         {

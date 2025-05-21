@@ -4,9 +4,9 @@ namespace Core;
 
 public class ManifestGenerator
 {
-    public static SceneDresserManifest GenerateManifest(string[] assetGuids, List<SceneAssetReferenceMap> scenes)
+    public static AssetReferenceManifest GenerateManifest(string[] assetGuids, List<AssetReferenceMap> scenes)
     {
-        var manifest = new SceneDresserManifest();
+        var manifest = new AssetReferenceManifest();
          foreach (var guid in assetGuids)
          {
              foreach (var scene in scenes)
@@ -24,7 +24,7 @@ public class ManifestGenerator
         return manifest;
     }
 
-    public static SceneDresserManifest GenerateAllAssetManifest(List<SceneAssetReferenceMap> scenes)
+    public static AssetReferenceManifest GenerateAllAssetManifest(List<AssetReferenceMap> scenes)
     {
         // this is functional programming (in two ways)
         return GenerateManifest(scenes.Aggregate(Enumerable.Empty<string>(), 

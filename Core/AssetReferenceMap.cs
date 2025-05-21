@@ -3,31 +3,31 @@ using Schema;
 
 namespace Core;
 
-public class SceneAssetReferenceMap
+public class AssetReferenceMap
 {
-    public string sceneName;
+    public string assetName;
     public Dictionary<long, TransformNode> goID2Transform;
     public Dictionary<long, GameObjectNode> goID2GameObject;
     public Dictionary<string, List<ComponentNode>> assetGuid2Component;
     public Dictionary<long, TransformNode> tsfmID2Transform;
 
-    public SceneAssetReferenceMap(string sceneName)
+    public AssetReferenceMap(string assetName)
     {
-        this.sceneName = sceneName;
+        this.assetName = assetName;
         goID2Transform = [];
         goID2GameObject = [];
         assetGuid2Component = [];
         tsfmID2Transform = [];
     }
     
-    public List<SceneDresserManifest.ManifestAssetPath>? CreateManifestEntry(string guid)
+    public List<AssetReferenceManifest.ManifestAssetPath>? CreateManifestEntry(string guid)
     {
         if (!ContainsAsset(guid))
         {
             return null;
         }
 
-        var manifestPaths = new List<SceneDresserManifest.ManifestAssetPath>();
+        var manifestPaths = new List<AssetReferenceManifest.ManifestAssetPath>();
         var foundAssets = assetGuid2Component[guid];
         
         foreach (var component in foundAssets.Take(Config.MaxAssetPathsIncludedPerScene))
@@ -35,9 +35,9 @@ public class SceneAssetReferenceMap
             var componentData = ResolveComponentData(guid, component);
             var hierarchyPath = ResolveHierarchyPath(component.GameObjectFileID);
 
-            manifestPaths.Add(new SceneDresserManifest.ManifestAssetPath
+            manifestPaths.Add(new AssetReferenceManifest.ManifestAssetPath
             {
-                SceneName = sceneName,
+                AssetName = assetName,
                 Component = componentData,
                 TransformPath = hierarchyPath.tsfmPath,
                 BaseGameObject = hierarchyPath.goName
@@ -70,7 +70,7 @@ public class SceneAssetReferenceMap
         return (rootGO.Name, sb.ToString());
     }
 
-    private SceneDresserManifest.ManifestComponentData ResolveComponentData(string assetGuid, ComponentNode component)
+    private AssetReferenceManifest.ManifestComponentData ResolveComponentData(string assetGuid, ComponentNode component)
     {
         var foundRecord = component.Assets.FindAll(refr => refr.Guid == assetGuid);
         if (foundRecord.Count > 1)
@@ -79,10 +79,10 @@ public class SceneAssetReferenceMap
         }
         if (foundRecord.Count == 0)
         {
-            throw new Exception($"There are no assets for GUID {assetGuid} in scene {sceneName}");
+            throw new Exception($"There are no assets for GUID {assetGuid} in scene {assetName}");
         }
 
-        var componentData = new SceneDresserManifest.ManifestComponentData
+        var componentData = new AssetReferenceManifest.ManifestComponentData
         {
             ComponentType = component.ComponentType,
             MemberName = foundRecord[0].MemberName,

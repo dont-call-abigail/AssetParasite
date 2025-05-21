@@ -71,13 +71,13 @@ namespace Core
                 }
             }
             
-            List<SceneAssetReferenceMap> sceneAssets = new();
+            List<AssetReferenceMap> sceneAssets = new();
 
             // totally paralellizable, if anyone feels so inclined
             foreach (var scenePath in Directory.GetFiles(sceneFolderPath, "*.unity"))
             {
                 if (Config.ExcludedScenes.Contains(Path.GetFileName(scenePath))) continue;
-                var parser = new SceneParser(scenePath);
+                var parser = new UnityAssetParser(scenePath);
                 sceneAssets.Add(parser.BuildAssetReferenceMap());
             }
 

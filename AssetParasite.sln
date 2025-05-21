@@ -2,7 +2,7 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Core", "Core\Core.csproj", "{04C64752-F547-47FD-A779-2D4516863C8D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Schema", "Schema\Schema.csproj", "{5F16DE1A-FB58-4CE9-A65A-D58C9E9FE8A7}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DatabaseOps", "DatabaseOps\DatabaseOps.csproj", "{8AD950F4-AE9D-4748-A412-3A382145755B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -14,9 +14,9 @@ Global
 		{04C64752-F547-47FD-A779-2D4516863C8D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{04C64752-F547-47FD-A779-2D4516863C8D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{04C64752-F547-47FD-A779-2D4516863C8D}.Release|Any CPU.Build.0 = Release|Any CPU
-		{5F16DE1A-FB58-4CE9-A65A-D58C9E9FE8A7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{5F16DE1A-FB58-4CE9-A65A-D58C9E9FE8A7}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{5F16DE1A-FB58-4CE9-A65A-D58C9E9FE8A7}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{5F16DE1A-FB58-4CE9-A65A-D58C9E9FE8A7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8AD950F4-AE9D-4748-A412-3A382145755B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8AD950F4-AE9D-4748-A412-3A382145755B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8AD950F4-AE9D-4748-A412-3A382145755B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8AD950F4-AE9D-4748-A412-3A382145755B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

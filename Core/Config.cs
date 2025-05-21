@@ -17,16 +17,17 @@ public static class Config
     public const int MaxAssetPathsIncludedPerScene = 2;
     public const int MaxPathsPerAsset = 3;
     public const string HelpMessage = """
-                                      AssetParasite builds a manifest of assets included in your scene files for easy locating during runtime.
+                                      AssetParasite builds a manifest of referenced assets.
                                       Usage: AssetParasite (scene folder) [options]
                                       Options:
                                       -o, --output          Path to save generated manifest.
                                       -a, --assets          Comma-seperated asset GUIDs to catalog. If not provided, the tool will catalog all assets.
                                       -n, --script-names    Path to a file which includes a line by line, comma seperated, mapping of asset GUIDs to 
                                                                 MonoBehaviour type names. Example line: fe2f6beebe0c93d45b047e3a99c9e426,PlayerCamera
-                                      -s, --exclude-scenes  Comma-seperated scene filenames to ignore.
+                                      -i, --include-files   Comma-seperated file extensions to try parsing.
                                       -e, --exclude-assets  Comma-seperated asset GUIDs to ignore.
                                       -v, --version         Print program version and exit.
+                                      -a, --find-all        Finds all occurances of an asset, instead of the first.
                                       -p                    Use PrettyPrint for manifest json.
                                       """;
 }
