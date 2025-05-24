@@ -2,13 +2,13 @@
 
 public static class Config
 {
-    public static HashSet<string> ExcludedAssets =
+    public static readonly HashSet<string> ExcludedAssets =
     [
         "0000000000000000f000000000000000",
         "0000000000000000e000000000000000"
         // ^^^ refs to builtin Unity assets
     ];
-    public static HashSet<string> WhitelistedFileExtensions = [
+    public static readonly HashSet<string> WhitelistedFileExtensions = [
       ".yaml", ".unity", ".asset", ".prefab"  
     ];
     public static string SearchPattern = "*";
@@ -26,10 +26,10 @@ public static class Config
                                       -o, --output-file         Path to database file for catalog. Defaults to "database.db".
                                       -f, --fresh               Clears the entire database before running. Database path should be provided before this arg.
                                       -m, --mod-guid            Guid to identify this mod. If not provided, assets are presumed to belong to the base game.
-                                      -a, --find-all            Finds all occurances of an asset, instead of the first.
+                                      -a, --find-all            Find all occurances of an asset, instead of the first.
                                       -p, --search-pattern      Used to determine which asset filetypes are included. The default is *. The * and ? characters are supported. Regular expressions are not supported.
                                       -e, --exclude-assets      Comma-seperated asset GUIDs to ignore.
-                                      -n, --script-names        Path to a file which includes a line by line, comma seperated, mapping of asset GUIDs to 
+                                      -s, --script-names        Path to a file which includes a line by line, comma seperated, mapping of asset GUIDs to 
                                                                     MonoBehaviour type names. Example line: fe2f6beebe0c93d45b047e3a99c9e426,PlayerCamera
                                       -v, --version             Print program version and exit.
                                       """;

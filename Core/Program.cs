@@ -48,7 +48,7 @@ namespace Core
                     {
                         Config.ExcludedAssets.Add(asset);
                     }
-                } else if (arg is "--script-names" or "-n")
+                } else if (arg is "--script-names" or "-s")
                 {
                     var lines = File.ReadAllLines(args[++i]);
                     foreach (var line in lines)

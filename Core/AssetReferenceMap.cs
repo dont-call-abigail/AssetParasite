@@ -50,6 +50,7 @@ public class AssetReferenceMap
             ManifestGenerator.Writer.InsertAsset(Config.ModGuid, assetName, guid, hierarchyPath.goName, hierarchyPath.tsfmPath,
                     componentIdx);
 
+            if (!Config.IncludeAllRefs) return true;
         }
 
         return true;
