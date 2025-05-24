@@ -28,8 +28,6 @@ public class UnityAssetParser
                 //ParserExtensions.PrintBlock(sceneBytes,cursor.CurrentMark.Position + 1, 4);
                 long currentAnchor = DecipherAnchor(sceneBytes, cursor.CurrentMark.Position + 2);
                 cursor.SkipAfter(ParseEventType.DocumentStart);
-                cursor.TryGetCurrentTag(out Tag t);
-                Console.WriteLine("Tag : " + t.ToString());
                 if (cursor.IsAt(ParseEventType.MappingStart))
                 {
                     cursor.Read();

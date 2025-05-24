@@ -27,11 +27,26 @@ public class AssetReferenceMap
         }
         
         var foundAssets = assetGuid2Component[guid];
-        foreach (var component in foundAssets)
+        for (var i = 0; i < foundAssets.Count; i++)
         {
-            var componentIdx = ResolveComponentData(guid, component);
+            var component = foundAssets[i];
+            var foundRecord = component.Assets.FindAll(refr => refr.Guid == guid);
+            if (foundRecord.Count > 1)
+            {
+                Console.WriteLine(
+                    $"WARNING: Found {foundRecord.Count} refs for asset {guid} on {component.ComponentType} (of {goID2GameObject[component.GameObjectFileID].Name})");
+                i += foundRecord.Count - 1;
+            }
+
+            if (foundRecord.Count == 0)
+            {
+                throw new Exception($"There are no assets for GUID {guid} in scene {assetName}");
+            }
+
+            var componentIdx = ResolveComponentData(foundRecord[0], component);
             var hierarchyPath = ResolveHierarchyPath(component.GameObjectFileID);
-            ManifestGenerator.Writer.InsertGameAsset(assetName, guid, hierarchyPath.goName, hierarchyPath.tsfmPath, componentIdx);
+            ManifestGenerator.Writer.InsertGameAsset(assetName, guid, hierarchyPath.goName, hierarchyPath.tsfmPath,
+                componentIdx);
         }
 
         return true;
@@ -60,27 +75,16 @@ public class AssetReferenceMap
         return (rootGO.Name, sb.ToString());
     }
 
-    private long ResolveComponentData(string assetGuid, ComponentNode component)
+    private long ResolveComponentData(ComponentNode.AssetReference @ref, ComponentNode component)
     {
-        var foundRecord = component.Assets.FindAll(refr => refr.Guid == assetGuid);
-        if (foundRecord.Count > 1)
-        {
-            Console.WriteLine($"WARNING: Found multiple refs for asset {assetGuid} on {component} (of {goID2GameObject[component.GameObjectFileID].Name})");
-        }
-        if (foundRecord.Count == 0)
-        {
-            throw new Exception($"There are no assets for GUID {assetGuid} in scene {assetName}");
-        }
-        
-        var recordData = foundRecord[0];
         long propId;
         if (component is MonoBehaviourNode scriptNode)
         {
-            propId = ManifestGenerator.Writer.InsertPropertyData(component.ComponentType, recordData.MemberName, recordData.IsCollection, recordData.CollectionIndex, scriptNode.ScriptGUID);
+            propId = ManifestGenerator.Writer.InsertPropertyData(component.ComponentType, @ref.MemberName, @ref.IsCollection, @ref.CollectionIndex, scriptNode.ScriptGUID);
         }
         else
         {
-            propId = ManifestGenerator.Writer.InsertPropertyData(component.ComponentType, recordData.MemberName, recordData.IsCollection, recordData.CollectionIndex);
+            propId = ManifestGenerator.Writer.InsertPropertyData(component.ComponentType, @ref.MemberName, @ref.IsCollection, @ref.CollectionIndex);
         }
         
         return propId;
