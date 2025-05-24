@@ -42,7 +42,7 @@ public class MonoBehaviourNode : ComponentNode
                             var potentialGuid = parser.ReadAssetGUID();
                             if (!string.IsNullOrEmpty(potentialGuid))
                             {
-                                newNode.Assets.Add(new AssetReference(potentialGuid, memberName!, index));
+                                newNode.Assets.Add(new AssetReference(potentialGuid, memberName!, true, index));
                             }
                             index++;
                         }
@@ -51,7 +51,7 @@ public class MonoBehaviourNode : ComponentNode
                         var potentialGuid1 = parser.ReadAssetGUID();
                         if (!string.IsNullOrEmpty(potentialGuid1))
                         {
-                            newNode.Assets.Add(new AssetReference(potentialGuid1, memberName!, 0));
+                            newNode.Assets.Add(new AssetReference(potentialGuid1, memberName!, false, -1));
                         }
                         break;
                 }

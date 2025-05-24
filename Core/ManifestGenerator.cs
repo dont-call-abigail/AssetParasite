@@ -1,33 +1,47 @@
-﻿using Schema;
+﻿using DatabaseOps;
 
 namespace Core;
 
-public class ManifestGenerator
+public static class ManifestGenerator
 {
-    public static AssetReferenceManifest GenerateManifest(string[] assetGuids, List<AssetReferenceMap> scenes)
+    private static DatabaseWriter? _writer;
+    private static DatabaseReader? _reader;
+
+    public static DatabaseWriter Writer
     {
-        var manifest = new AssetReferenceManifest();
-         foreach (var guid in assetGuids)
-         {
-             foreach (var scene in scenes)
-             { 
-                 var foundAssets = scene.CreateManifestEntry(guid); 
-                 if (foundAssets != null && !manifest.Assets.TryAdd(guid, foundAssets))
-                 {
-                    manifest.Assets[guid].AddRange(foundAssets);
-                 }
-                
-                 if (manifest.Assets.TryGetValue(guid, out var items) && items.Count >= Config.MaxPathsPerAsset) break;
-            }
-         }
-        
-        return manifest;
+        get
+        {
+            _writer ??= new DatabaseWriter(Config.DatabasePath);
+            return _writer;
+        }
     }
 
-    public static AssetReferenceManifest GenerateAllAssetManifest(List<AssetReferenceMap> scenes)
+    public static DatabaseReader Reader
     {
-        // this is functional programming (in two ways)
-        return GenerateManifest(scenes.Aggregate(Enumerable.Empty<string>(), 
+        get
+        {
+            _reader ??= new DatabaseReader();
+            return _reader;
+        }
+    }
+    
+    public static void GenerateManifest(string[] assetGuids, List<AssetReferenceMap> assets)
+    {
+        foreach (var guid in assetGuids)
+        {
+            bool includedOnceFlag = false;
+            foreach (var asset in assets)
+            { 
+                if (!Config.IncludeAllRefs && includedOnceFlag) break;
+                includedOnceFlag = asset.TryCreateManifestEntry(guid); 
+            }
+        }
+        
+    }
+
+    public static void GenerateAllAssetManifest(List<AssetReferenceMap> scenes)
+    {
+        GenerateManifest(scenes.Aggregate(Enumerable.Empty<string>(), 
             (current, scene) => current.Union(scene.assetGuid2Component.Keys)).ToArray(), scenes);
     }
 }

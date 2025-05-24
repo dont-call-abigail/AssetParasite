@@ -65,9 +65,9 @@ namespace Core
                         }
                         Config.Guid2ScriptName.TryAdd(parts[0], parts[1]);
                     }
-                } else if (arg is "-p")
+                } else if (arg is "-a" or "--find-all")
                 {
-                    Config.PrettyPrint = true;
+                    Config.IncludeAllRefs = true;
                 }
             }
             
@@ -81,14 +81,15 @@ namespace Core
                 sceneAssets.Add(parser.BuildAssetReferenceMap());
             }
 
-            var manifest = assetGuids != null ? 
-                ManifestGenerator.GenerateManifest(assetGuids, sceneAssets) 
-                : ManifestGenerator.GenerateAllAssetManifest(sceneAssets);
+            if (assetGuids != null)
+            {
+                ManifestGenerator.GenerateManifest(assetGuids, sceneAssets);
+            }
+            else
+            {
+                ManifestGenerator.GenerateAllAssetManifest(sceneAssets);
+            }
 
-#pragma warning disable CA1869
-            string serializedManifest = JsonSerializer.Serialize(manifest, new JsonSerializerOptions { WriteIndented = Config.PrettyPrint });
-#pragma warning restore CA1869
-            File.WriteAllText(!string.IsNullOrEmpty(outputPath) ? outputPath : "manifest.json", serializedManifest);
         }
     }
 }

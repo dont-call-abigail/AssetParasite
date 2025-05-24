@@ -1,11 +1,11 @@
 CREATE TABLE "component_types" (
                                    "id"	INTEGER NOT NULL,
-                                   "type"	TEXT,
+                                   "type"	TEXT UNIQUE ,
                                    PRIMARY KEY("id" AUTOINCREMENT)
 );
 CREATE TABLE "script_types" (
                                 "id"	INTEGER NOT NULL,
-                                "type"	TEXT,
+                                "type"	TEXT UNIQUE ,
                                 PRIMARY KEY("id" AUTOINCREMENT)
 );
 CREATE TABLE "property_data" (
@@ -18,25 +18,28 @@ CREATE TABLE "property_data" (
 	PRIMARY KEY("id" AUTOINCREMENT)
 );
 
-CREATE TABLE "asset_refs" (
+CREATE TABLE "asset_sources" (
     "id" INTEGER NOT NULL,
-    "asset_guid"	TEXT,
     "base_gameobject"	TEXT,
     "transform_path"	TEXT,
-    "component_data_id"	INTEGER,
+    "property_id"	INTEGER,
     PRIMARY KEY("id" AUTOINCREMENT)
 );
 
 CREATE TABLE "mod_assets" (
                               "instance_id"	INTEGER NOT NULL,
-                                "mod_guid" TEXT NOT NULL,
+                              "mod_guid" TEXT NOT NULL,
+                              "asset_guid"	TEXT,
+                              "asset_name"    TEXT,
                               "ref_id" INTEGER NOT NULL,
                               PRIMARY KEY("instance_id" AUTOINCREMENT)
 );
 
 CREATE TABLE "game_assets" (
                                "instance_id"	INTEGER NOT NULL,
-                               "ref_id" INTEGER NOT NULL,
+                               "asset_guid"	TEXT,
+                               "asset_name"    TEXT,
+                               "source_id" INTEGER NOT NULL,
                                 PRIMARY KEY("instance_id" AUTOINCREMENT)
 );
 

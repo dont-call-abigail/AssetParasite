@@ -4,7 +4,7 @@ namespace Core;
 
 public class ComponentNode
 {
-    public record AssetReference(string Guid, string MemberName, int CollectionIndex);
+    public record AssetReference(string Guid, string MemberName, bool IsCollection, int CollectionIndex);
     public List<AssetReference> Assets;
     public string ComponentType;
     public long GameObjectFileID;
@@ -41,7 +41,7 @@ public class ComponentNode
                             var potentialGuid = parser.ReadAssetGUID();
                             if (!string.IsNullOrEmpty(potentialGuid))
                             {
-                                newNode.Assets.Add(new AssetReference(potentialGuid, memberName, index));
+                                newNode.Assets.Add(new AssetReference(potentialGuid, memberName, true, index));
                             }
                             index++;
                         }
@@ -50,7 +50,7 @@ public class ComponentNode
                         var potentialGuid1 = parser.ReadAssetGUID();
                         if (!string.IsNullOrEmpty(potentialGuid1))
                         {
-                            newNode.Assets.Add(new AssetReference(potentialGuid1, memberName, 0));
+                            newNode.Assets.Add(new AssetReference(potentialGuid1, memberName, false, -1));
                         }
                         break;
                 }

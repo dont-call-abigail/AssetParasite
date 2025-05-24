@@ -1,11 +1,10 @@
 ﻿using System.Text;
-using Schema;
 
 namespace Core;
 
 public class AssetReferenceMap
 {
-    public string assetName;
+    public readonly string assetName;
     public Dictionary<long, TransformNode> goID2Transform;
     public Dictionary<long, GameObjectNode> goID2GameObject;
     public Dictionary<string, List<ComponentNode>> assetGuid2Component;
@@ -20,31 +19,22 @@ public class AssetReferenceMap
         tsfmID2Transform = [];
     }
     
-    public List<AssetReferenceManifest.ManifestAssetPath>? CreateManifestEntry(string guid)
+    public bool TryCreateManifestEntry(string guid)
     {
         if (!ContainsAsset(guid))
         {
-            return null;
+            return false;
         }
-
-        var manifestPaths = new List<AssetReferenceManifest.ManifestAssetPath>();
+        
         var foundAssets = assetGuid2Component[guid];
-        
-        foreach (var component in foundAssets.Take(Config.MaxAssetPathsIncludedPerScene))
+        foreach (var component in foundAssets)
         {
-            var componentData = ResolveComponentData(guid, component);
+            var componentIdx = ResolveComponentData(guid, component);
             var hierarchyPath = ResolveHierarchyPath(component.GameObjectFileID);
-
-            manifestPaths.Add(new AssetReferenceManifest.ManifestAssetPath
-            {
-                AssetName = assetName,
-                Component = componentData,
-                TransformPath = hierarchyPath.tsfmPath,
-                BaseGameObject = hierarchyPath.goName
-            });
+            ManifestGenerator.Writer.InsertGameAsset(assetName, guid, hierarchyPath.goName, hierarchyPath.tsfmPath, componentIdx);
         }
-        
-        return manifestPaths;
+
+        return true;
     }
 
     public bool ContainsAsset(string assetGuid)
@@ -70,7 +60,7 @@ public class AssetReferenceMap
         return (rootGO.Name, sb.ToString());
     }
 
-    private AssetReferenceManifest.ManifestComponentData ResolveComponentData(string assetGuid, ComponentNode component)
+    private long ResolveComponentData(string assetGuid, ComponentNode component)
     {
         var foundRecord = component.Assets.FindAll(refr => refr.Guid == assetGuid);
         if (foundRecord.Count > 1)
@@ -81,20 +71,19 @@ public class AssetReferenceMap
         {
             throw new Exception($"There are no assets for GUID {assetGuid} in scene {assetName}");
         }
-
-        var componentData = new AssetReferenceManifest.ManifestComponentData
-        {
-            ComponentType = component.ComponentType,
-            MemberName = foundRecord[0].MemberName,
-            CollectionIndex = foundRecord[0].CollectionIndex
-        };
         
+        var recordData = foundRecord[0];
+        long propId;
         if (component is MonoBehaviourNode scriptNode)
         {
-            componentData.ScriptGuid = scriptNode.ScriptGUID;
+            propId = ManifestGenerator.Writer.InsertPropertyData(component.ComponentType, recordData.MemberName, recordData.IsCollection, recordData.CollectionIndex, scriptNode.ScriptGUID);
         }
-
-        return componentData;
+        else
+        {
+            propId = ManifestGenerator.Writer.InsertPropertyData(component.ComponentType, recordData.MemberName, recordData.IsCollection, recordData.CollectionIndex);
+        }
+        
+        return propId;
     }
 
 }
