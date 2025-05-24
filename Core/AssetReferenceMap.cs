@@ -45,8 +45,11 @@ public class AssetReferenceMap
 
             var componentIdx = ResolveComponentData(foundRecord[0], component);
             var hierarchyPath = ResolveHierarchyPath(component.GameObjectFileID);
-            ManifestGenerator.Writer.InsertGameAsset(assetName, guid, hierarchyPath.goName, hierarchyPath.tsfmPath,
-                componentIdx);
+
+
+            ManifestGenerator.Writer.InsertAsset(Config.ModGuid, assetName, guid, hierarchyPath.goName, hierarchyPath.tsfmPath,
+                    componentIdx);
+
         }
 
         return true;
@@ -80,7 +83,8 @@ public class AssetReferenceMap
         long propId;
         if (component is MonoBehaviourNode scriptNode)
         {
-            propId = ManifestGenerator.Writer.InsertPropertyData(component.ComponentType, @ref.MemberName, @ref.IsCollection, @ref.CollectionIndex, scriptNode.ScriptGUID);
+            propId = ManifestGenerator.Writer.InsertPropertyData(component.ComponentType, @ref.MemberName, @ref.IsCollection, @ref.CollectionIndex, 
+                Config.Guid2ScriptName.TryGetValue(scriptNode.ScriptGUID, out var type) ? type : scriptNode.ScriptGUID);
         }
         else
         {

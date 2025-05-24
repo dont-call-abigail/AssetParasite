@@ -28,30 +28,26 @@ namespace Core
                 }
             }
 
-            string sceneFolderPath = args[0];
+            string assetFolderPath = args[0];
             string[]? assetGuids = null;
             string? outputPath = null;
             
             for (int i = 1; i < args.Length; i++)
             {
                 var arg = args[i];
-                if (arg is "--exclude-assets" or "-a")
+                if (arg is "--output-file" or "-o")
+                {
+                    Config.DatabasePath = args[++i];
+                } else if (arg is "--search-pattern" or "-p")
+                {
+                    Config.SearchPattern = args[++i];
+                } else if (arg is "--exclude-assets" or "-e")
                 {
                     var excludeAssets = args[++i].Split(',');
-                    foreach (var assetId in excludeAssets)
+                    foreach (var asset in excludeAssets)
                     {
-                        Config.ExcludedAssets.Add(assetId);
+                        Config.ExcludedAssets.Add(asset);
                     }
-                } else if (arg is "--exclude-scenes" or "-s")
-                {
-                    var excludeScenes = args[++i].Split(',');
-                    foreach (var sceneName in excludeScenes)
-                    {
-                        Config.ExcludedScenes.Add(sceneName.EndsWith(".unity") ? sceneName : sceneName + ".unity");
-                    }
-                } else if (arg is "--assets" or "-a")
-                {
-                    assetGuids = args[++i].Split();
                 } else if (arg is "--script-names" or "-n")
                 {
                     var lines = File.ReadAllLines(args[++i]);
@@ -68,16 +64,26 @@ namespace Core
                 } else if (arg is "-a" or "--find-all")
                 {
                     Config.IncludeAllRefs = true;
+                } else if (arg is "--fresh" or "-f")
+                {
+                    if (File.Exists(Config.DatabasePath)) File.Delete(Config.DatabasePath);
+                    Console.WriteLine("Removing database file...");
+                } else if (arg is "--mod-guid" or "-m")
+                {
+                    Config.ModGuid = args[++i];
+                } else if (arg is "--verbose" or "-v")
+                {
+                    Config.VerboseLogging = true;
                 }
             }
             
             List<AssetReferenceMap> sceneAssets = new();
 
             // totally paralellizable, if anyone feels so inclined
-            foreach (var scenePath in Directory.GetFiles(sceneFolderPath, "*.unity"))
+            foreach (var assetPath in Directory.GetFiles(assetFolderPath, Config.SearchPattern))
             {
-                if (Config.ExcludedScenes.Contains(Path.GetFileName(scenePath))) continue;
-                var parser = new UnityAssetParser(scenePath);
+                if (!Config.WhitelistedFileExtensions.Contains(Path.GetExtension(assetPath))) continue;
+                var parser = new UnityAssetParser(assetPath);
                 sceneAssets.Add(parser.BuildAssetReferenceMap());
             }
 

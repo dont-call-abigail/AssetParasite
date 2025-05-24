@@ -33,8 +33,12 @@ public class UnityAssetParser
                     cursor.Read();
                     
                     var objectType = cursor.ReadScalarAsString();
-                    Console.WriteLine($"     Processing object {currentAnchor} @ {cursor.CurrentMark} (Type {objectType})");
-                    
+                    if (Config.VerboseLogging)
+                    {
+                        Console.WriteLine(
+                            $"     Processing object {currentAnchor} @ {cursor.CurrentMark} (Type {objectType})");
+                    }
+
                     switch (objectType)
                     {
                         case "GameObject":
@@ -95,7 +99,11 @@ public class UnityAssetParser
                 {
                     assetMap.assetGuid2Component.Add(assetRef.Guid, [cn]);
                 }
-                Console.WriteLine($"     FOUND: {assetRef.MemberName} @ {assetRef.Guid}");
+
+                if (Config.VerboseLogging)
+                {
+                    Console.WriteLine($"     FOUND: {assetRef.MemberName} @ {assetRef.Guid}");
+                }
             }
         } 
     }

@@ -18,7 +18,7 @@ CREATE TABLE "property_data" (
 	PRIMARY KEY("id" AUTOINCREMENT)
 );
 
-CREATE TABLE "asset_sources" (
+CREATE TABLE "asset_locations" (
     "id" INTEGER NOT NULL,
     "base_gameobject"	TEXT,
     "transform_path"	TEXT,
@@ -26,21 +26,13 @@ CREATE TABLE "asset_sources" (
     PRIMARY KEY("id" AUTOINCREMENT)
 );
 
-CREATE TABLE "mod_assets" (
+CREATE TABLE "assets" (
                               "instance_id"	INTEGER NOT NULL,
-                              "mod_guid" TEXT NOT NULL,
+                              "source" TEXT NOT NULL,
                               "asset_guid"	TEXT,
                               "asset_name"    TEXT,
-                              "ref_id" INTEGER NOT NULL,
+                              "location_id" INTEGER NOT NULL,
                               PRIMARY KEY("instance_id" AUTOINCREMENT)
-);
-
-CREATE TABLE "game_assets" (
-                               "instance_id"	INTEGER NOT NULL,
-                               "asset_guid"	TEXT,
-                               "asset_name"    TEXT,
-                               "source_id" INTEGER NOT NULL,
-                                PRIMARY KEY("instance_id" AUTOINCREMENT)
 );
 
 INSERT INTO script_types (id, type) VALUES (-1, 'None');
