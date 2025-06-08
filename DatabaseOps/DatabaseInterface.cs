@@ -12,6 +12,7 @@ namespace DatabaseOps
         {
             try
             {
+                bool isNew = !File.Exists(databasePath);
                 _db = new SqliteConnection(new SqliteConnectionStringBuilder
                 {
                     DataSource = databasePath,
@@ -20,7 +21,13 @@ namespace DatabaseOps
                     ForeignKeys = false
                 }.ConnectionString);
                 _db.Open();
-                
+
+                if (isNew)
+                {
+                    var command = _db.CreateCommand();
+                    command.CommandText = Resources.Init;
+                    command.ExecuteNonQuery();
+                }
             }
             catch (Exception e)
             {

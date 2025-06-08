@@ -14,30 +14,22 @@ namespace DatabaseOps
         private SqliteCommand _addScriptTypeCommand;
         private SqliteCommand _addComponentTypeCommand;
         private SqliteCommand _addAssetLocationCommand;
-
-        private Dictionary<string, long> _componentTypeCache;
-        private Dictionary<string, long> _scriptTypeCache;
+        private SqliteCommand _removeModAssetsCommand;
 
         public DatabaseWriter(string databasePath) : base(databasePath)
         {
-            var command = _db.CreateCommand();
-            command.CommandText = Resources.Init;
-            command.ExecuteNonQuery();
-
-            _componentTypeCache = new Dictionary<string, long>();
-            _scriptTypeCache = new Dictionary<string, long>();
-            
             CreateSQLCommands();
         }
 
-        public long InsertPropertyData(string componentType, string propertyName, bool isCollection = false, long collectionIndex = -1, string scriptName = "None")
+        public long InsertPropertyData(string componentType, string propertyName, bool isCollection = false, long collectionIndex = -1, string scriptGuid = "None")
         {
             try
             {
                 _transaction = _db.BeginTransaction();
                 _addPropertyDataCommand.Transaction = _transaction;
+                Console.WriteLine("Registering component " + componentType);
                 _addPropertyDataCommand.Parameters["@component"].Value = GetComponentTypeId(componentType);
-                _addPropertyDataCommand.Parameters["@script"].Value = GetScriptTypeId(scriptName);
+                _addPropertyDataCommand.Parameters["@script"].Value = scriptGuid;
                 _addPropertyDataCommand.Parameters["@property"].Value = propertyName;
                 _addPropertyDataCommand.Parameters["@collection"].Value = isCollection ? 1 : 0;
                 _addPropertyDataCommand.Parameters["@collection_idx"].Value = collectionIndex;
@@ -85,36 +77,33 @@ namespace DatabaseOps
 
         private long GetComponentTypeId(string type)
         {
-            if (_componentTypeCache.TryGetValue(type, out long id))
-            {
-                return id;
-            }
-            else
-            {
-                _addComponentTypeCommand.Transaction = _transaction;
-                _addComponentTypeCommand.Parameters["@type"].Value = type;
-                var res = (long?)_addComponentTypeCommand.ExecuteScalar();
-                if (res.HasValue) _componentTypeCache.Add(type, res.Value);
-            }
-
+            _addComponentTypeCommand.Transaction = _transaction;
+            _addComponentTypeCommand.Parameters["@type"].Value = type;
+            var res = (long?)_addComponentTypeCommand.ExecuteScalar();
+            if (res.HasValue) return res.Value;
+            
             return -1;
         }
 
-        private long GetScriptTypeId(string type)
+        public bool InsertScriptTypeId(string typeName, string guid)
         {
-            if (_scriptTypeCache.TryGetValue(type, out long id))
-            {
-                return id;
-            }
-            else
-            {
-                _addScriptTypeCommand.Transaction = _transaction;
-                _addScriptTypeCommand.Parameters["@type"].Value = type;
-                var res = (long?)_addScriptTypeCommand.ExecuteScalar();
-                if (res.HasValue) _scriptTypeCache.Add(type, res.Value);
-            }
+            _transaction = _db.BeginTransaction();
+            _addScriptTypeCommand.Transaction = _transaction;
+            _addScriptTypeCommand.Parameters["@id"].Value = guid;
+            _addScriptTypeCommand.Parameters["@type"].Value = typeName;
+            int res = _addScriptTypeCommand.ExecuteNonQuery();
+            _transaction.Commit();
+            return res > 0; 
+        }
 
-            return -1;
+        public bool RemoveModAssets(string modGuid)
+        {
+            _transaction = _db.BeginTransaction();
+            _removeModAssetsCommand.Transaction = _transaction;
+            _removeModAssetsCommand.Parameters["@source"].Value = modGuid;
+            int res = _addScriptTypeCommand.ExecuteNonQuery();
+            _transaction.Commit();
+            return res > 0;
         }
         
         private void CreateSQLCommands()
@@ -131,7 +120,8 @@ namespace DatabaseOps
             _addComponentTypeCommand.Parameters.Add("@type", SqliteType.Text);
             
             _addScriptTypeCommand = _db.CreateCommand();
-            _addScriptTypeCommand.CommandText = "INSERT OR IGNORE INTO script_types (type) VALUES(@type);SELECT id FROM script_types WHERE type = @type;";
+            _addScriptTypeCommand.CommandText = "INSERT OR IGNORE INTO script_types (id, type) VALUES(@id, @type);";
+            _addScriptTypeCommand.Parameters.Add("@id", SqliteType.Text);
             _addScriptTypeCommand.Parameters.Add("@type", SqliteType.Text);
 
             _addPropertyDataCommand = _db.CreateCommand();
@@ -149,6 +139,10 @@ namespace DatabaseOps
             _addAssetLocationCommand.Parameters.Add("@gameobject", SqliteType.Text);
             _addAssetLocationCommand.Parameters.Add("@path", SqliteType.Text);
             _addAssetLocationCommand.Parameters.Add("@prop_id", SqliteType.Integer);
+
+            _removeModAssetsCommand = _db.CreateCommand();
+            _removeModAssetsCommand.CommandText = "DELETE FROM assets WHERE source = @source";
+            _removeModAssetsCommand.Parameters.Add("@source", SqliteType.Text);
         }
         
         
