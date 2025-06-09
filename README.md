@@ -19,11 +19,9 @@ Prerequisites to make maximum use of this project:
 ## Release information
 
 AssetParasite releases take two forms:
-- `AssetParasite.exe` is the executable for the YAML parser that produces the asset reference database.
-- `AssetParasite.zip` is a folder containing DLLs for the AssetParasite, if you prefer a library to an executable.
-- `DatabaseOps.dll` is a library for interfacing with the asset reference database.
-
-Everything targets .NET Standard 2.0 to support usage as a plugin in Unity 2020.3+.
+- An executable for the YAML parser that produces the asset reference database. Runs on Windows, Linux, using .NET 8.
+- A folder containing DLLs for the AssetParasite, if you prefer a library to an executable. Targets .NET Standard 2.0 for compatibility with Unity 2020.3+.
+  - Of the DLLs, `DatabaseOps.dll` can be used over `AssetParasite.dll` if you only need to fetch manifest data (i.e. at game runtime)
 
 ## Usage
 You can provide a folder OR a path to a text file containing a list of asset paths.
