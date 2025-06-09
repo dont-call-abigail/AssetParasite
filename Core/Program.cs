@@ -21,7 +21,7 @@ namespace Core
                     Console.WriteLine(Config.HelpMessage);
                     return;
                 }
-                if (lonelyArg is "--version")
+                if (lonelyArg is "--version" or "-v")
                 {
                     Console.WriteLine(Assembly.GetEntryAssembly().GetName().Version);
                     return;
