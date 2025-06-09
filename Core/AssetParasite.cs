@@ -79,9 +79,12 @@ namespace AssetManifest
                 } else if (arg == "--verbose" || arg == "-v")
                 {
                     Config.VerboseLogging = true;
-                } else if (arg == "-scenes" || arg == "-u")
+                } else if (arg == "--scenes" || arg == "-u")
                 {
                     Config.SearchPattern = "*.unity";
+                } else if (arg == "--only-matches" || arg == "-o")
+                {
+                    Config.OnlyRegisterBasegameMatches = true;
                 }
             }
             
@@ -120,6 +123,16 @@ namespace AssetManifest
             }
             
             ManifestGenerator.GenerateAllAssetManifest(sceneAssets);
+            
+            Logger.WriteLine($"Success! Asset reference database is built.");
+            ManifestGenerator.Reader.Dispose();
+            ManifestGenerator.Writer.Dispose();
+        }
+
+        public static void GenerateManifest(string assetFolder, ParserConfig config)
+        {
+            Config = config;
+            GenerateManifest(FetchAssetsFromSource(assetFolder), config);
         }
 
         static void RegisterMonoScripts()

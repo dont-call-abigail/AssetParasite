@@ -75,6 +75,8 @@ namespace AssetManifest
                 sb.Insert(0, $"{currNode.RootOrder}");
                 currNode = tsfmID2Transform[currNode.Parent];
             }
+             
+            if (AssetParasite.Config.VerboseLogging) AssetParasite.Logger.WriteLine($"Resolving GameObject @ {goID}");
 
             var rootGO = goID2GameObject[currNode.GameObjectID];
 

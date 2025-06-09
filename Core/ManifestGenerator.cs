@@ -28,7 +28,7 @@ namespace AssetManifest
             }
         }
     
-        public static void GenerateManifest(string[] assetGuids, List<AssetReferenceMap> assets)
+        public static void GenerateManifest(string[] assetGuids, List<AssetReferenceMap> assetRefMaps)
         {
             if (AssetParasite.Config.FlushModAssets)
             {
@@ -38,10 +38,19 @@ namespace AssetManifest
             foreach (var guid in assetGuids)
             {
                 bool includedOnceFlag = false;
-                foreach (var asset in assets)
+                if (AssetParasite.Config.OnlyRegisterBasegameMatches && !Reader.EntryExistsForAsset(guid))
+                {
+                    if (AssetParasite.Config.VerboseLogging)
+                    {
+                        AssetParasite.Logger.WriteLine($"Skipping registration of asset {guid} due to lack of basegame match!");
+                    }
+                    break;
+                }
+                
+                foreach (var referenceMap in assetRefMaps)
                 { 
                     if (!AssetParasite.Config.IncludeAllRefs && includedOnceFlag) break;
-                    includedOnceFlag = asset.TryCreateManifestEntry(guid); 
+                    includedOnceFlag = referenceMap.TryCreateManifestEntry(guid); 
                 }
             }
         
