@@ -46,7 +46,6 @@ public class AssetReferenceMap
             var componentIdx = ResolveComponentData(foundRecord[0], component);
             var hierarchyPath = ResolveHierarchyPath(component.GameObjectFileID);
 
-
             ManifestGenerator.Writer.InsertAsset(Config.ModGuid, assetName, guid, hierarchyPath.goName, hierarchyPath.tsfmPath,
                     componentIdx);
 

@@ -27,7 +27,6 @@ namespace DatabaseOps
             {
                 _transaction = _db.BeginTransaction();
                 _addPropertyDataCommand.Transaction = _transaction;
-                Console.WriteLine("Registering component " + componentType);
                 _addPropertyDataCommand.Parameters["@component"].Value = GetComponentTypeId(componentType);
                 _addPropertyDataCommand.Parameters["@script"].Value = scriptGuid;
                 _addPropertyDataCommand.Parameters["@property"].Value = propertyName;
@@ -101,7 +100,7 @@ namespace DatabaseOps
             _transaction = _db.BeginTransaction();
             _removeModAssetsCommand.Transaction = _transaction;
             _removeModAssetsCommand.Parameters["@source"].Value = modGuid;
-            int res = _addScriptTypeCommand.ExecuteNonQuery();
+            int res = _removeModAssetsCommand.ExecuteNonQuery();
             _transaction.Commit();
             return res > 0;
         }

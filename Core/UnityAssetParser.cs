@@ -75,14 +75,14 @@ public class UnityAssetParser
         int numberEndIdx = 0;
         for (int i = 0; i < intStr.Length; i++)
         {
+            numberEndIdx = i;
             if (!char.IsNumber(intStr[i]))
             {
-                numberEndIdx = i;
                 break;
             }
         }
 
-        return int.Parse(intStr[..numberEndIdx]);
+        return long.Parse(intStr[..numberEndIdx]);
     }
 
     private void RegisterComponentAssets(ComponentNode cn)

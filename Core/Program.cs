@@ -21,7 +21,7 @@ namespace Core
                     Console.WriteLine(Config.HelpMessage);
                     return;
                 }
-                if (lonelyArg is "--version" or "-v")
+                if (lonelyArg is "--version")
                 {
                     Console.WriteLine(Assembly.GetEntryAssembly().GetName().Version);
                     return;
@@ -87,6 +87,7 @@ namespace Core
             // totally paralellizable, if anyone feels so inclined
             foreach (var assetPath in FetchAssetsFromSource(assetFolderOrRegistryFile))
             {
+                if (!Config.WhitelistedFileExtensions.Contains(Path.GetExtension(assetPath))) continue;
                 var parser = new UnityAssetParser(assetPath);
                 sceneAssets.Add(parser.BuildAssetReferenceMap());
             }
@@ -104,7 +105,6 @@ namespace Core
                 HashSet<string> assets = [];
                 foreach (var assetPath in Directory.GetFiles(path, Config.SearchPattern, SearchOption.AllDirectories))
                 {
-                    if (!Config.WhitelistedFileExtensions.Contains(Path.GetExtension(assetPath))) continue;
                     assets.Add(assetPath);
                 }
 

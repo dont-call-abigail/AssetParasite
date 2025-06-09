@@ -19,7 +19,7 @@ public static class Config
     public static bool FlushModAssets = false;
     public static string? MonoScriptsFolder = null;
     
-    public const int AnchorByteBufferSize = 13;     // 13 bytes is the length of a long int in UTF-8
+    public const int AnchorByteBufferSize = 18;  
     public const string HelpMessage = """
                                       AssetParasite builds a manifest of referenced assets.
                                       Usage: AssetParasite (asset folder|asset path list file) [options]
@@ -33,6 +33,6 @@ public static class Config
                                       -e, --exclude-assets      Comma-seperated asset GUIDs to ignore.
                                       -s, --script-path         Path to a folder containing MonoScripts and associated .meta files.
                                       -u, --scenes              Only process scene files. Intended for ingesting references from base game.
-                                      -v, --version             Print program version and exit.
+                                      -v, --verbose             Extra logging information for debugging.
                                       """;
 }

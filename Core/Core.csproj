@@ -10,7 +10,7 @@
         <Company>Jack Burkhardt</Company>
         <AssemblyVersion>2.0</AssemblyVersion>
         <PackageId />
-        <Version />
+        <Version>2.0.0</Version>
         <FileVersion>1</FileVersion>
     </PropertyGroup>
 
