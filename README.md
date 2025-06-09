@@ -3,7 +3,7 @@ This project empowers modders of Unity games to reference base game assets witho
 
 
 > [!IMPORTANT]  
-> If you are using Unity 2022 or newer, consider using [UnityDataTools](https://github.com/Unity-Technologies/UnityDataTools/). It is far more robust and better maintained than this tool.
+> If you are using Unity 2022 or newer, strongly consider using [UnityDataTools](https://github.com/Unity-Technologies/UnityDataTools/). It is far more robust and better maintained than this tool.
 
 Given a selection of Unity yaml asset files, this tool will:
 - Find assets (materials, textures, etc) referenced within those files
@@ -14,13 +14,16 @@ Using this data, you can assign asset references to your objects by grabbing a r
 
 Prerequisites to make maximum use of this project:
 - Ripped base game assets in YAML form using [AssetRipper](https://github.com/AssetRipper/AssetRipper)
-- Including scripts (using the `-s` argument) is strongly encouraged
+- Including MonoScript files (using the `-s` argument) is strongly encouraged
 
 ## Release information
 
-AssetParasite releases have two fundamental artifacts:
-- `AssetParasite.exe` is the executable for the YAML parser that produces the asset reference database. It targets .NET 8.
-- `DatabaseOps.dll` is a library for interfacing with the asset reference database. It targets .NET Standard 2.0/2.1 and .NET 6.0/8.0.
+AssetParasite releases take two forms:
+- `AssetParasite.exe` is the executable for the YAML parser that produces the asset reference database.
+- `AssetParasite.zip` is a folder containing DLLs for the AssetParasite, if you prefer a library to an executable.
+- `DatabaseOps.dll` is a library for interfacing with the asset reference database.
+
+Everything targets .NET Standard 2.0 to support usage as a plugin in Unity 2020.3+.
 
 ## Usage
 You can provide a folder OR a path to a text file containing a list of asset paths.

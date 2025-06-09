@@ -1,96 +1,100 @@
-﻿using System.Text;
+﻿using System;
+using System.Collections.Generic;
+using System.Text;
+using AssetManifest.Nodes;
 
-namespace Core;
-
-public class AssetReferenceMap
+namespace AssetManifest
 {
-    public readonly string assetName;
-    public Dictionary<long, TransformNode> goID2Transform;
-    public Dictionary<long, GameObjectNode> goID2GameObject;
-    public Dictionary<string, List<ComponentNode>> assetGuid2Component;
-    public Dictionary<long, TransformNode> tsfmID2Transform;
+    public class AssetReferenceMap
+    {
+        public readonly string assetName;
+        public Dictionary<long, TransformNode> goID2Transform;
+        public Dictionary<long, GameObjectNode> goID2GameObject;
+        public Dictionary<string, List<ComponentNode>> assetGuid2Component;
+        public Dictionary<long, TransformNode> tsfmID2Transform;
 
-    public AssetReferenceMap(string assetName)
-    {
-        this.assetName = assetName;
-        goID2Transform = [];
-        goID2GameObject = [];
-        assetGuid2Component = [];
-        tsfmID2Transform = [];
-    }
-    
-    public bool TryCreateManifestEntry(string guid)
-    {
-        if (!ContainsAsset(guid))
+        public AssetReferenceMap(string assetName)
         {
-            return false;
+            this.assetName = assetName;
+            goID2Transform = new Dictionary<long, TransformNode> { };
+            goID2GameObject = new Dictionary<long, GameObjectNode> { };
+            assetGuid2Component = new Dictionary<string, List<ComponentNode>> { };
+            tsfmID2Transform = new Dictionary<long, TransformNode> { };
         }
-        
-        var foundAssets = assetGuid2Component[guid];
-        for (var i = 0; i < foundAssets.Count; i++)
+    
+        public bool TryCreateManifestEntry(string guid)
         {
-            var component = foundAssets[i];
-            var foundRecord = component.Assets.FindAll(refr => refr.Guid == guid);
-            if (foundRecord.Count > 1)
+            if (!ContainsAsset(guid))
             {
-                Console.WriteLine(
-                    $"WARNING: Found {foundRecord.Count} refs for asset {guid} on {component.ComponentType} (of {goID2GameObject[component.GameObjectFileID].Name})");
-                i += foundRecord.Count - 1;
+                return false;
             }
-
-            if (foundRecord.Count == 0)
+        
+            var foundAssets = assetGuid2Component[guid];
+            for (var i = 0; i < foundAssets.Count; i++)
             {
-                throw new Exception($"There are no assets for GUID {guid} in scene {assetName}");
-            }
+                var component = foundAssets[i];
+                var foundRecord = component.Assets.FindAll(refr => refr.Guid == guid);
+                if (foundRecord.Count > 1)
+                {
+                    Console.WriteLine(
+                        $"WARNING: Found {foundRecord.Count} refs for asset {guid} on {component.ComponentType} (of {goID2GameObject[component.GameObjectFileID].Name})");
+                    i += foundRecord.Count - 1;
+                }
 
-            var componentIdx = ResolveComponentData(foundRecord[0], component);
-            var hierarchyPath = ResolveHierarchyPath(component.GameObjectFileID);
+                if (foundRecord.Count == 0)
+                {
+                    throw new Exception($"There are no assets for GUID {guid} in scene {assetName}");
+                }
 
-            ManifestGenerator.Writer.InsertAsset(Config.ModGuid, assetName, guid, hierarchyPath.goName, hierarchyPath.tsfmPath,
+                var componentIdx = ResolveComponentData(foundRecord[0], component);
+                var hierarchyPath = ResolveHierarchyPath(component.GameObjectFileID);
+
+                ManifestGenerator.Writer.InsertAsset(AssetParasite.Config.ModGuid, assetName, guid, hierarchyPath.goName, hierarchyPath.tsfmPath,
                     componentIdx);
 
-            if (!Config.IncludeAllRefs) return true;
+                if (!AssetParasite.Config.IncludeAllRefs) return true;
+            }
+
+            return true;
         }
 
-        return true;
-    }
-
-    public bool ContainsAsset(string assetGuid)
-    {
-        return assetGuid2Component.ContainsKey(assetGuid);
-    }
-
-    private (string goName, string tsfmPath) ResolveHierarchyPath(long goID)
-    {
-        if (goID == 0) return ("", "");
-        StringBuilder sb = new StringBuilder();
-        TransformNode currNode = goID2Transform[goID];
-
-        while (currNode.Parent != 0)
+        public bool ContainsAsset(string assetGuid)
         {
-            if (sb.Length >= 1) sb.Insert(0, ';');
-            sb.Insert(0, $"{currNode.RootOrder}");
-            currNode = tsfmID2Transform[currNode.Parent];
+            return assetGuid2Component.ContainsKey(assetGuid);
         }
 
-        var rootGO = goID2GameObject[currNode.GameObjectID];
-
-        return (rootGO.Name, sb.ToString());
-    }
-
-    private long ResolveComponentData(ComponentNode.AssetReference assetRef, ComponentNode component)
-    {
-        long propId;
-        if (component is MonoBehaviourNode scriptNode)
+        private (string goName, string tsfmPath) ResolveHierarchyPath(long goID)
         {
-            propId = ManifestGenerator.Writer.InsertPropertyData(component.ComponentType, assetRef.MemberName, assetRef.IsCollection, assetRef.CollectionIndex, scriptNode.ScriptGUID);
+            if (goID == 0) return ("", "");
+            StringBuilder sb = new StringBuilder();
+            TransformNode currNode = goID2Transform[goID];
+
+            while (currNode.Parent != 0)
+            {
+                if (sb.Length >= 1) sb.Insert(0, ';');
+                sb.Insert(0, $"{currNode.RootOrder}");
+                currNode = tsfmID2Transform[currNode.Parent];
+            }
+
+            var rootGO = goID2GameObject[currNode.GameObjectID];
+
+            return (rootGO.Name, sb.ToString());
         }
-        else
+
+        private long ResolveComponentData(ComponentNode.AssetReference assetRef, ComponentNode component)
         {
-            propId = ManifestGenerator.Writer.InsertPropertyData(component.ComponentType, assetRef.MemberName, assetRef.IsCollection, assetRef.CollectionIndex);
-        }
+            long propId;
+            if (component is MonoBehaviourNode scriptNode)
+            {
+                propId = ManifestGenerator.Writer.InsertPropertyData(component.ComponentType, assetRef.MemberName, assetRef.IsCollection, assetRef.CollectionIndex, scriptNode.ScriptGUID);
+            }
+            else
+            {
+                propId = ManifestGenerator.Writer.InsertPropertyData(component.ComponentType, assetRef.MemberName, assetRef.IsCollection, assetRef.CollectionIndex);
+            }
         
-        return propId;
-    }
+            return propId;
+        }
 
+    }
 }

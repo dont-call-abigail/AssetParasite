@@ -1,29 +1,30 @@
-﻿
+﻿using AssetManifest.Parser;
 using VYaml.Parser;
 
-namespace Core;
-
-public class GameObjectNode
+namespace AssetManifest.Nodes
 {
-    public string Name;
-
-    public static GameObjectNode ParseSelf(ref YamlParser parser)
+    public class GameObjectNode
     {
-        var newNode = new GameObjectNode();
-        while (!parser.IsAt(ParseEventType.DocumentEnd))
+        public string Name;
+
+        public static GameObjectNode ParseSelf(ref YamlParser parser)
         {
-            if (parser.IsAt(ParseEventType.Scalar))
+            var newNode = new GameObjectNode();
+            while (!parser.IsAt(ParseEventType.DocumentEnd))
             {
-                var nameFound = parser.TryGetSpecificScalar("m_Name", out string? potentialName);
-                if (nameFound)
+                if (parser.IsAt(ParseEventType.Scalar))
                 {
-                    newNode.Name = potentialName!;
+                    var nameFound = parser.TryGetSpecificScalar("m_Name", out string potentialName);
+                    if (nameFound)
+                    {
+                        newNode.Name = potentialName;
+                    }
                 }
+
+                parser.Read();
             }
 
-            parser.Read();
+            return newNode;
         }
-
-        return newNode;
     }
 }

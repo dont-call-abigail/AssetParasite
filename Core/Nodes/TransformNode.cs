@@ -1,55 +1,58 @@
-﻿using VYaml.Parser;
+﻿using System.Collections.Generic;
+using AssetManifest.Parser;
+using VYaml.Parser;
 
-namespace Core;
-
-// For our purposes Transforms are not considered Components. Their chief usage is traversal in scene hierarchies.
-public class TransformNode
+namespace AssetManifest.Nodes
 {
-    public long FileID;
-    public long GameObjectID;
-    public int RootOrder;
-    public long Parent;
-    public long[] Children;
-
-    public static TransformNode ParseSelf(ref YamlParser cursor, long fileID)
+    // For our purposes Transforms are not considered Components. Their chief usage is traversal in scene hierarchies.
+    public class TransformNode
     {
-        var newNode = new TransformNode();
-        newNode.FileID = fileID;
-        
-        while (!cursor.IsAt(ParseEventType.DocumentEnd))
+        public long FileID;
+        public long GameObjectID;
+        public int RootOrder;
+        public long Parent;
+        public long[] Children;
+
+        public static TransformNode ParseSelf(ref YamlParser cursor, long fileID)
         {
-            if (cursor.IsAt(ParseEventType.Scalar))
+            var newNode = new TransformNode();
+            newNode.FileID = fileID;
+        
+            while (!cursor.IsAt(ParseEventType.DocumentEnd))
             {
-                var key = cursor.ReadScalarAsString();
-                switch (key)
+                if (cursor.IsAt(ParseEventType.Scalar))
                 {
-                    case "m_GameObject":
-                        newNode.GameObjectID = cursor.ReadFileID();
-                        break;
-                    case "m_RootOrder":
-                        newNode.RootOrder = cursor.ReadScalarAsInt32();
-                        break;
-                    case "m_Father":
-                        newNode.Parent = cursor.ReadFileID();
-                        break;
-                    case "m_Children":
+                    var key = cursor.ReadScalarAsString();
+                    switch (key)
                     {
-                        List<long> childIDs = [];
-                        while (!cursor.IsAt(ParseEventType.SequenceEnd))
+                        case "m_GameObject":
+                            newNode.GameObjectID = cursor.ReadFileID();
+                            break;
+                        case "m_RootOrder":
+                            newNode.RootOrder = cursor.ReadScalarAsInt32();
+                            break;
+                        case "m_Father":
+                            newNode.Parent = cursor.ReadFileID();
+                            break;
+                        case "m_Children":
                         {
-                            cursor.Read();
-                            var childID = cursor.ReadFileID();
-                            if (childID != -1) childIDs.Add(childID);
+                            List<long> childIDs = new List<long>();
+                            while (!cursor.IsAt(ParseEventType.SequenceEnd))
+                            {
+                                cursor.Read();
+                                var childID = cursor.ReadFileID();
+                                if (childID != -1) childIDs.Add(childID);
+                            }
+                            newNode.Children = childIDs.ToArray();
+                            break;
                         }
-                        newNode.Children = childIDs.ToArray();
-                        break;
                     }
                 }
+
+                cursor.Read();
             }
 
-            cursor.Read();
+            return newNode;
         }
-
-        return newNode;
     }
 }

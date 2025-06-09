@@ -1,52 +1,59 @@
-﻿using System.Reflection;
-using System.Text.Json;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Reflection;
+using AssetManifest.Parser;
 
-namespace Core
+namespace AssetManifest
 {
-    internal class Program
+    public class AssetParasite
     {
+        public static ParserConfig Config;
         static void Main(string[] args)
         {
             if (args.Length == 0)
             {
-                Console.WriteLine(Config.HelpMessage);
+                Console.WriteLine(ParserConfig.HelpMessage);
                 return;
             } 
             
             if (args.Length == 1)
             {
                 string lonelyArg = args[0];
-                if (lonelyArg is "--help" or "-h")
+                if (lonelyArg == "--help" || lonelyArg == "-h")
                 {
-                    Console.WriteLine(Config.HelpMessage);
+                    Console.WriteLine(ParserConfig.HelpMessage);
                     return;
                 }
-                if (lonelyArg is "--version" or "-v")
+                if (lonelyArg == "--version" || lonelyArg == "-v")
                 {
                     Console.WriteLine(Assembly.GetEntryAssembly().GetName().Version);
                     return;
                 }
             }
 
+            Config = new ParserConfig();
+
             string assetFolderOrRegistryFile = args[0];
             
             for (int i = 1; i < args.Length; i++)
             {
                 var arg = args[i];
-                if (arg is "--output-file" or "-o")
+                if (arg == "--output-file" || arg == "-o")
                 {
                     Config.DatabasePath = args[++i];
-                } else if (arg is "--search-pattern" or "-p")
+                } else if (arg == "--search-pattern" || arg == "-p")
                 {
                     Config.SearchPattern = args[++i];
-                } else if (arg is "--exclude-assets" or "-e")
+                } else if (arg == "--exclude-assets" || arg == "-e")
                 {
                     var excludeAssets = args[++i].Split(',');
                     foreach (var asset in excludeAssets)
                     {
                         Config.ExcludedAssets.Add(asset);
                     }
-                } else if (arg is "--script-path" or "-s")
+                } else if (arg == "--script-path" || arg == "-s")
                 {
                     var maybePath = args[++i];
                     if (Directory.Exists(maybePath))
@@ -58,31 +65,31 @@ namespace Core
                         Console.Write("ERROR! Provided script folder cannot be found. Given: " + maybePath);
                     }
 
-                } else if (arg is "-a" or "--find-all")
+                } else if (arg == "-a" || arg == "--find-all")
                 {
                     Config.IncludeAllRefs = true;
-                } else if (arg is "--fresh" or "-f")
+                } else if (arg == "--fresh" || arg == "-f")
                 {
                     Config.FlushModAssets = true;
-                } else if (arg is "--mod-guid" or "-m")
+                } else if (arg == "--mod-guid" || arg == "-m")
                 {
                     Config.ModGuid = args[++i];
-                } else if (arg is "--verbose" or "-v")
+                } else if (arg == "--verbose" || arg == "-v")
                 {
                     Config.VerboseLogging = true;
-                } else if (arg is "-scenes" or "-u")
+                } else if (arg == "-scenes" || arg == "-u")
                 {
                     Config.SearchPattern = "*.unity";
                 }
             }
             
-            if (!string.IsNullOrEmpty(Config.MonoScriptsFolder))
-            {
-                Console.WriteLine($"MonoScripts folder : {Config.MonoScriptsFolder}");
-                ManifestGenerator.PopulateScriptIDs(Config.MonoScriptsFolder);
-            }
-            
-            List<AssetReferenceMap> sceneAssets = new();
+            RunStandalone(assetFolderOrRegistryFile);
+        }
+
+        private static void RunStandalone(string assetFolderOrRegistryFile)
+        {
+            RegisterMonoScripts();
+            List<AssetReferenceMap> sceneAssets = new List<AssetReferenceMap>();
 
             // totally paralellizable, if anyone feels so inclined
             foreach (var assetPath in FetchAssetsFromSource(assetFolderOrRegistryFile))
@@ -95,6 +102,33 @@ namespace Core
             ManifestGenerator.GenerateAllAssetManifest(sceneAssets);
         }
 
+        public static void GenerateManifest(IEnumerable<string> assetPaths, ParserConfig config)
+        {
+            Config = config;
+            
+            RegisterMonoScripts();
+            List<AssetReferenceMap> sceneAssets = new List<AssetReferenceMap>();
+
+            // totally paralellizable, if anyone feels so inclined
+            foreach (var assetPath in assetPaths)
+            {
+                if (!Config.WhitelistedFileExtensions.Contains(Path.GetExtension(assetPath))) continue;
+                var parser = new UnityAssetParser(assetPath);
+                sceneAssets.Add(parser.BuildAssetReferenceMap());
+            }
+            
+            ManifestGenerator.GenerateAllAssetManifest(sceneAssets);
+        }
+
+        static void RegisterMonoScripts()
+        {
+            if (!string.IsNullOrEmpty(Config.MonoScriptsFolder))
+            {
+                Console.WriteLine($"MonoScripts folder : {Config.MonoScriptsFolder}");
+                ManifestGenerator.PopulateScriptIDs(Config.MonoScriptsFolder);
+            }
+        }
+
         static string[] FetchAssetsFromSource(string path)
         {
             if (File.Exists(path))
@@ -102,7 +136,7 @@ namespace Core
                 return File.ReadAllLines(path);
             } else if (Directory.Exists(path))
             {
-                HashSet<string> assets = [];
+                HashSet<string> assets = new HashSet<string> { };
                 foreach (var assetPath in Directory.GetFiles(path, Config.SearchPattern, SearchOption.AllDirectories))
                 {
                     assets.Add(assetPath);
