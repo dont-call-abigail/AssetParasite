@@ -99,7 +99,7 @@ namespace AssetManifest.Parser
         {
             var caughtBytes = new byte[Math.Abs(offset) + 1];
             Buffer.BlockCopy(bytes, offset > 0 ? idx : idx - offset, caughtBytes, 0, Math.Abs(offset));
-            Console.WriteLine($"[{Encoding.UTF8.GetString(caughtBytes)}]");
+            AssetParasite.Logger.WriteLine($"[{Encoding.UTF8.GetString(caughtBytes)}]");
         }
     }
 }

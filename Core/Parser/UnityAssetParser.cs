@@ -23,7 +23,7 @@ namespace AssetManifest.Parser
             var sceneBytes = File.ReadAllBytes(assetPath);
             var cursor = YamlParser.FromBytes(sceneBytes);
         
-            Console.WriteLine($"Parsing asset {Path.GetFileName(assetPath)}");
+            AssetParasite.Logger.WriteLine($"Parsing asset {Path.GetFileName(assetPath)}");
         
             while (cursor.Read())
             {
@@ -39,7 +39,7 @@ namespace AssetManifest.Parser
                         var objectType = cursor.ReadScalarAsString();
                         if (AssetParasite.Config.VerboseLogging)
                         {
-                            Console.WriteLine(
+                            AssetParasite.Logger.WriteLine(
                                 $"     Processing object {currentAnchor} @ {cursor.CurrentMark} (Type {objectType})");
                         }
 
@@ -107,7 +107,7 @@ namespace AssetManifest.Parser
 
                     if (AssetParasite.Config.VerboseLogging)
                     {
-                        Console.WriteLine($"     FOUND: {assetRef.MemberName} @ {assetRef.Guid}");
+                        AssetParasite.Logger.WriteLine($"     FOUND: {assetRef.MemberName} @ {assetRef.Guid}");
                     }
                 }
             } 

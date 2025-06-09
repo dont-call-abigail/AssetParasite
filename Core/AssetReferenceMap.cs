@@ -36,7 +36,7 @@ namespace AssetManifest
                 var foundRecord = component.Assets.FindAll(refr => refr.Guid == guid);
                 if (foundRecord.Count > 1)
                 {
-                    Console.WriteLine(
+                    AssetParasite.Logger.WriteLine(
                         $"WARNING: Found {foundRecord.Count} refs for asset {guid} on {component.ComponentType} (of {goID2GameObject[component.GameObjectFileID].Name})");
                     i += foundRecord.Count - 1;
                 }

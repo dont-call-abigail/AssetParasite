@@ -10,11 +10,13 @@ namespace AssetManifest
     public class AssetParasite
     {
         public static ParserConfig Config;
+        public static Logger Logger = new Logger();
+        
         static void Main(string[] args)
         {
             if (args.Length == 0)
             {
-                Console.WriteLine(ParserConfig.HelpMessage);
+                AssetParasite.Logger.WriteLine(ParserConfig.HelpMessage);
                 return;
             } 
             
@@ -23,12 +25,12 @@ namespace AssetManifest
                 string lonelyArg = args[0];
                 if (lonelyArg == "--help" || lonelyArg == "-h")
                 {
-                    Console.WriteLine(ParserConfig.HelpMessage);
+                    Logger.WriteLine(ParserConfig.HelpMessage);
                     return;
                 }
                 if (lonelyArg == "--version" || lonelyArg == "-v")
                 {
-                    Console.WriteLine(Assembly.GetEntryAssembly().GetName().Version);
+                    Logger.WriteLine(Assembly.GetEntryAssembly().GetName().Version);
                     return;
                 }
             }
@@ -124,7 +126,7 @@ namespace AssetManifest
         {
             if (!string.IsNullOrEmpty(Config.MonoScriptsFolder))
             {
-                Console.WriteLine($"MonoScripts folder : {Config.MonoScriptsFolder}");
+                AssetParasite.Logger.WriteLine($"MonoScripts folder : {Config.MonoScriptsFolder}");
                 ManifestGenerator.PopulateScriptIDs(Config.MonoScriptsFolder);
             }
         }
