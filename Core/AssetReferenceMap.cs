@@ -46,7 +46,6 @@ public class AssetReferenceMap
             var componentIdx = ResolveComponentData(foundRecord[0], component);
             var hierarchyPath = ResolveHierarchyPath(component.GameObjectFileID);
 
-
             ManifestGenerator.Writer.InsertAsset(Config.ModGuid, assetName, guid, hierarchyPath.goName, hierarchyPath.tsfmPath,
                     componentIdx);
 
@@ -79,17 +78,16 @@ public class AssetReferenceMap
         return (rootGO.Name, sb.ToString());
     }
 
-    private long ResolveComponentData(ComponentNode.AssetReference @ref, ComponentNode component)
+    private long ResolveComponentData(ComponentNode.AssetReference assetRef, ComponentNode component)
     {
         long propId;
         if (component is MonoBehaviourNode scriptNode)
         {
-            propId = ManifestGenerator.Writer.InsertPropertyData(component.ComponentType, @ref.MemberName, @ref.IsCollection, @ref.CollectionIndex, 
-                Config.Guid2ScriptName.TryGetValue(scriptNode.ScriptGUID, out var type) ? type : scriptNode.ScriptGUID);
+            propId = ManifestGenerator.Writer.InsertPropertyData(component.ComponentType, assetRef.MemberName, assetRef.IsCollection, assetRef.CollectionIndex, scriptNode.ScriptGUID);
         }
         else
         {
-            propId = ManifestGenerator.Writer.InsertPropertyData(component.ComponentType, @ref.MemberName, @ref.IsCollection, @ref.CollectionIndex);
+            propId = ManifestGenerator.Writer.InsertPropertyData(component.ComponentType, assetRef.MemberName, assetRef.IsCollection, assetRef.CollectionIndex);
         }
         
         return propId;

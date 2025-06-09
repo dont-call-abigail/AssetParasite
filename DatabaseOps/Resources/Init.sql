@@ -4,14 +4,14 @@ CREATE TABLE "component_types" (
                                    PRIMARY KEY("id" AUTOINCREMENT)
 );
 CREATE TABLE "script_types" (
-                                "id"	INTEGER NOT NULL,
+                                "id"	TEXT NOT NULL,
                                 "type"	TEXT UNIQUE ,
-                                PRIMARY KEY("id" AUTOINCREMENT)
+                                PRIMARY KEY("id")
 );
 CREATE TABLE "property_data" (
 	"id"	INTEGER NOT NULL,
 	"component_id"	INTEGER,
-	"script_id"	INTEGER,
+	"script_id"	TEXT,
 	"property_name"	INTEGER,
 	"is_collection"	INTEGER,
 	"collection_index"	INTEGER,
@@ -35,7 +35,7 @@ CREATE TABLE "assets" (
                               PRIMARY KEY("instance_id" AUTOINCREMENT)
 );
 
-INSERT INTO script_types (id, type) VALUES (-1, 'None');
+INSERT INTO script_types (id, type) VALUES ('-1', 'None');
 
 PRAGMA synchronous = OFF;
 PRAGMA journal_mode = MEMORY;
