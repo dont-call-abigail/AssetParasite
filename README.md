@@ -23,7 +23,7 @@ AssetParasite releases have two fundamental artifacts:
 - `DatabaseOps.dll` is a library for interfacing with the asset reference database. It targets .NET Standard 2.0/2.1 and .NET 6.0/8.0.
 
 ## Usage
-
+You can provide a folder OR a path to a text file containing a list of asset paths.
 ```
 Usage: AssetParasite (asset folder|asset path list file) [options]
 Options:
