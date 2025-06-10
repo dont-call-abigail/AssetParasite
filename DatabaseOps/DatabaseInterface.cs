@@ -38,6 +38,7 @@ namespace DatabaseOps
 
         public void Dispose()
         {
+            _db?.Close();
             _db?.Dispose();
         }
     }

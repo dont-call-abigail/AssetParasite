@@ -123,10 +123,6 @@ namespace AssetManifest
             }
             
             ManifestGenerator.GenerateAllAssetManifest(sceneAssets);
-            
-            Logger.WriteLine($"Success! Asset reference database is built.");
-            ManifestGenerator.Reader.Dispose();
-            ManifestGenerator.Writer.Dispose();
         }
 
         public static void GenerateManifest(string assetFolder, ParserConfig config)

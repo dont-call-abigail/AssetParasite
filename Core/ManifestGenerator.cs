@@ -53,7 +53,9 @@ namespace AssetManifest
                     includedOnceFlag = referenceMap.TryCreateManifestEntry(guid); 
                 }
             }
-        
+            
+            AssetParasite.Logger.WriteLine($"Success! Asset reference database is built.");
+            DestroyInterfaces();
         }
 
         public static void GenerateAllAssetManifest(List<AssetReferenceMap> scenes)
@@ -76,6 +78,14 @@ namespace AssetManifest
                 string guid = File.ReadAllLines(metaPath)[1].Split(' ')[1];
                 Writer.InsertScriptTypeId(typeName, guid);
             }
+        }
+
+        private static void DestroyInterfaces()
+        {
+            _writer.Dispose();
+            _reader.Dispose();
+            _writer = null;
+            _reader = null;
         }
     }
 }
