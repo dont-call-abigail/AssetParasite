@@ -28,19 +28,21 @@ You can provide a folder OR a path to a text file containing a list of asset pat
 ```
 Usage: AssetParasite (asset folder|asset path list file) [options]
 Options:
--o, --output-file         Path to database file for catalog. Defaults to "database.db".
+-o, --output-file         Path to database file for catalog. Defaults to ""database.db"".
 -m, --mod-guid            Guid to identify this mod. If not provided, assets are presumed to belong to the base game.
 -f, --fresh               Clears the database entries for a given mod. Database path should be provided before this arg.
-                             If a mod guid is not provided, all assets will be cleared.
+                              If a mod guid is not provided, all assets will be cleared.
 -a, --find-all            Find all occurances of an asset, instead of the first.
--p, --search-pattern      Used to determine which asset filetypes are included. The default is *. The * and ? characters are supported. Regular expressions are not supported.
+-o, --only-matches        Only add asset references where a match exists in the ""basegame"" collection.
+-p, --search-pattern      Used to determine which asset filetypes are included. The default is *. 
+                              The * and ? characters are supported. Regular expressions are not supported.
 -e, --exclude-assets      Comma-seperated asset GUIDs to ignore.
 -s, --script-path         Path to a folder containing MonoScripts and associated .meta files.
 -u, --scenes              Only process scene files. Intended for ingesting references from base game.
 -v, --verbose             Extra logging information for debugging.
 ```
 
-## Dependencies
+## AssetRipper proudly uses the following projects
 - [VYaml](https://github.com/hadashiA/VYaml), for superfast YAML parsing
 - [UnityDataTools](https://github.com/Unity-Technologies/UnityDataTools/), as a reference
 - [Microsoft.Data.SQlite](https://learn.microsoft.com/en-us/dotnet/standard/data/sqlite/?tabs=net-cli), as our SQLite engine
