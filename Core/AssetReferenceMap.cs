@@ -88,7 +88,7 @@ namespace AssetManifest
             long propId;
             if (component is MonoBehaviourNode scriptNode)
             {
-                propId = ManifestGenerator.Writer.InsertPropertyData(component.ComponentType, assetRef.MemberName, assetRef.IsCollection, assetRef.CollectionIndex, scriptNode.ScriptGUID);
+                propId = ManifestGenerator.Writer.InsertPropertyData(scriptNode.ComponentType, assetRef.MemberName, assetRef.IsCollection, assetRef.CollectionIndex, scriptNode.ScriptGUID);
             }
             else
             {

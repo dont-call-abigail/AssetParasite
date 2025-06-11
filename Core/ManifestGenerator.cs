@@ -38,7 +38,7 @@ namespace AssetManifest
             foreach (var guid in assetGuids)
             {
                 bool includedOnceFlag = false;
-                if (AssetParasite.Config.OnlyRegisterBasegameMatches && !Reader.EntryExistsForAsset(guid))
+                if (AssetParasite.Config.OnlyRegisterBasegameMatches && !Reader.EntryExistsForAsset(guid, "basegame"))
                 {
                     if (AssetParasite.Config.VerboseLogging)
                     {
@@ -76,7 +76,7 @@ namespace AssetManifest
                 string typeName = Path.GetFileNameWithoutExtension(metaPath);
                 typeName = typeName.Substring(0, typeName.Length - 3);
                 string guid = File.ReadAllLines(metaPath)[1].Split(' ')[1];
-                Writer.InsertScriptTypeId(typeName, guid);
+                Writer.InsertComponentType(typeName, guid);
             }
         }
 
