@@ -28,7 +28,11 @@ namespace AssetManifest.Nodes
                     } else if (memberName == "m_Script")
                     {
                         newNode.ScriptGUID = parser.ReadAssetGUID();
-                        newNode.ComponentType = ManifestGenerator.Reader.GetScriptType(newNode.ScriptGUID);
+                        newNode.ComponentType = ManifestGenerator.Reader.GetComponentType(newNode.ScriptGUID);
+                        if (newNode.ComponentType == "MonoBehaviour" && AssetParasite.Config.VerboseLogging)
+                        {
+                            AssetParasite.Logger.WriteLine($"WARNING: Could not find derived type for MonoBehaviour with GUID {newNode.ScriptGUID}");
+                        }
                     }
 
                     switch (parser.CurrentEventType)

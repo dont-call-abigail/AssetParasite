@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using AssetManifest.Database;
 using Microsoft.Data.Sqlite;
 
 namespace DatabaseOps
@@ -29,7 +30,7 @@ namespace DatabaseOps
                     command.ExecuteNonQuery();
                 }
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 Console.WriteLine($"ERROR OPENING ASSET REFERENCE DATABASE at {databasePath}");
                 throw;

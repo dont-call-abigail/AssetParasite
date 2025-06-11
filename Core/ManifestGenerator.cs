@@ -38,7 +38,7 @@ namespace AssetManifest
             foreach (var guid in assetGuids)
             {
                 bool includedOnceFlag = false;
-                if (AssetParasite.Config.OnlyRegisterBasegameMatches && !Reader.EntryExistsForAsset(guid, "basegame"))
+                if (AssetParasite.Config.OnlyRegisterBasegameMatches && !Reader.EntryExistsForAssetId(guid, "basegame"))
                 {
                     if (AssetParasite.Config.VerboseLogging)
                     {

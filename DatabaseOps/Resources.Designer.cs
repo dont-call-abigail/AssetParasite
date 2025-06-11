@@ -7,7 +7,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace DatabaseOps {
+namespace AssetManifest.Database {
     using System;
     
     
@@ -38,7 +38,7 @@ namespace DatabaseOps {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("DatabaseOps.Resources", typeof(Resources).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("AssetManifest.Database.Resources", typeof(Resources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -61,18 +61,24 @@ namespace DatabaseOps {
         
         /// <summary>
         ///   Looks up a localized string similar to CREATE TABLE &quot;component_types&quot; (
-        ///                                   &quot;id&quot;	INTEGER NOT NULL,
+        ///                                   &quot;id&quot;	TEXT NOT NULL UNIQUE,
         ///                                   &quot;type&quot;	TEXT UNIQUE ,
-        ///                                   PRIMARY KEY(&quot;id&quot; AUTOINCREMENT)
+        ///                                   PRIMARY KEY(&quot;id&quot;)
         ///);
-        ///CREATE TABLE &quot;script_types&quot; (
-        ///                                &quot;id&quot;	INTEGER NOT NULL,
-        ///                                &quot;type&quot;	TEXT UNIQUE ,
-        ///                                PRIMARY KEY(&quot;id&quot; AUTOINCREMENT)
-        ///);
+        ///
         ///CREATE TABLE &quot;property_data&quot; (
         ///	&quot;id&quot;	INTEGER NOT NULL,
-        ///	&quot;component_id&quot;	INTEGER [rest of string was truncated]&quot;;.
+        ///	&quot;component_id&quot;	TEXT,
+        ///	&quot;property_name&quot;	INTEGER,
+        ///	&quot;is_collection&quot;	INTEGER,
+        ///	&quot;collection_index&quot;	INTEGER,
+        ///	PRIMARY KEY(&quot;id&quot; AUTOINCREMENT)
+        ///);
+        ///
+        ///CREATE TABLE &quot;asset_locations&quot; (
+        ///    &quot;id&quot; INTEGER NOT NULL,
+        ///    &quot;base_gameobject&quot;	TEXT,
+        ///    [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string Init {
             get {

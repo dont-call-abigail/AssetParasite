@@ -2,7 +2,7 @@
 
     <PropertyGroup>
         <Nullable>disable</Nullable>
-        <AssemblyName>AssetParasite</AssemblyName>
+        <AssemblyName>AssetParasite.Core</AssemblyName>
         <LangVersion>8</LangVersion>
         <Company>Jack Burkhardt</Company>
         <AssemblyVersion>1.2</AssemblyVersion>

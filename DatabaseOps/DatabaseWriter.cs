@@ -49,7 +49,7 @@ namespace DatabaseOps
                 _transaction.Commit();
                 return res;
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 _transaction.Rollback();
                 throw;
@@ -70,7 +70,7 @@ namespace DatabaseOps
                 _addModAssetCommand.ExecuteNonQuery();
 
                 _transaction.Commit();
-            }  catch (Exception e)
+            }  catch (Exception)
             {
                 _transaction.Rollback();
                 throw;

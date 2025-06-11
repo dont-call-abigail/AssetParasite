@@ -26,11 +26,6 @@ namespace AssetManifest.Nodes
         public string ComponentType;
         public long GameObjectFileID;
 
-        public override bool Equals(object obj)
-        {
-            return obj is ComponentNode other && other.Assets == Assets;
-        }
-
         public static ComponentNode ParseSelf(ref YamlParser parser, string componentType)
         {
             var newNode = new ComponentNode();
