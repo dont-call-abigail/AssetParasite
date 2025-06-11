@@ -42,7 +42,7 @@ Options:
 -v, --verbose             Extra logging information for debugging.
 ```
 
-## AssetRipper proudly uses the following projects
+## AssetParasite proudly uses the following projects
 - [VYaml](https://github.com/hadashiA/VYaml), for superfast YAML parsing
 - [UnityDataTools](https://github.com/Unity-Technologies/UnityDataTools/), as a reference
 - [Microsoft.Data.SQlite](https://learn.microsoft.com/en-us/dotnet/standard/data/sqlite/?tabs=net-cli), as our SQLite engine
