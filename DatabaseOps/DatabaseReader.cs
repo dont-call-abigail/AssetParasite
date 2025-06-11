@@ -89,7 +89,7 @@ namespace DatabaseOps
                         Source = reader.GetString(0),
                         Guid = reader.GetString(1),
                         BaseGameObject = reader.GetString(2),
-                        TransformPath = reader.GetString(3).Split(';').Select(idx => Convert.ToInt32(idx)).ToArray(),
+                        TransformPath = ParseTransformPath(reader.GetString(3)),
                         Property = reader.GetString(4),
                         IsCollection = reader.GetBoolean(5),
                         CollectionIndex = reader.GetInt32(6),
@@ -100,6 +100,11 @@ namespace DatabaseOps
             }
             _transaction.Commit();
             return results;
+        }
+
+        private int[] ParseTransformPath(string path)
+        {
+            return string.IsNullOrEmpty(path) ? Array.Empty<int>() : path.Split(';').Select(idx => Convert.ToInt32(idx)).ToArray();
         }
 
         private void CreateSQLCommands()
