@@ -9,6 +9,7 @@ Given a selection of Unity yaml asset files, this tool will:
 - Find assets (materials, textures, etc) referenced within those files
 - Store the field information of the object containing the reference
 - Build a path from a root GameObject to the object containing the property, via Transform hierarchy
+
 And then stores all of the above information into an SQLite database.
 
 Using this data, you can assign asset references for your objects by grabbing a reference to the same asset from an object in the base game. It is meant for projects where base game assets are not otherwise accessible using AssetBundles.
