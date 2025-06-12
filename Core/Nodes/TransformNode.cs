@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
-using AssetManifest.Parser;
+using AssetCatalogue.Parser;
 using VYaml.Parser;
 
-namespace AssetManifest.Nodes
+namespace AssetCatalogue.Nodes
 {
     // For our purposes Transforms are not considered Components. Their chief usage is traversal in scene hierarchies.
     public class TransformNode

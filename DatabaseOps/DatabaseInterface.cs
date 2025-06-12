@@ -1,9 +1,8 @@
 ﻿using System;
 using System.IO;
-using AssetManifest.Database;
 using Microsoft.Data.Sqlite;
 
-namespace DatabaseOps
+namespace AssetCatalogue.Database
 {
     public abstract class DatabaseInterface : IDisposable
     {

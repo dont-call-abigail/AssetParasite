@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
-using AssetManifest.Parser;
+using AssetCatalogue.Parser;
 using VYaml.Parser;
 
-namespace AssetManifest.Nodes
+namespace AssetCatalogue.Nodes
 {
     public class MonoBehaviourNode : ComponentNode
     {
@@ -28,7 +28,7 @@ namespace AssetManifest.Nodes
                     } else if (memberName == "m_Script")
                     {
                         newNode.ScriptGUID = parser.ReadAssetGUID();
-                        newNode.ComponentType = ManifestGenerator.Reader.GetComponentType(newNode.ScriptGUID);
+                        newNode.ComponentType = CatalogueGenerator.Reader.GetComponentType(newNode.ScriptGUID);
                         if (newNode.ComponentType == "MonoBehaviour" && AssetParasite.Config.VerboseLogging)
                         {
                             AssetParasite.Logger.WriteLine($"WARNING: Could not find derived type for MonoBehaviour with GUID {newNode.ScriptGUID}");

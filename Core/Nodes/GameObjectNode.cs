@@ -1,7 +1,7 @@
-﻿using AssetManifest.Parser;
+﻿using AssetCatalogue.Parser;
 using VYaml.Parser;
 
-namespace AssetManifest.Nodes
+namespace AssetCatalogue.Nodes
 {
     public class GameObjectNode
     {

@@ -1,29 +1,28 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using Microsoft.Data.Sqlite;
 
-namespace DatabaseOps
+namespace AssetCatalogue.Database
 {
-    public class DatabaseWriter : DatabaseInterface
+    public class CatalogueWriter : DatabaseInterface
     {
         private SqliteTransaction _transaction;
         
         private SqliteCommand _addModAssetCommand;
-        private SqliteCommand _addPropertyDataCommand;
+        private SqliteCommand _addFieldDataCommand;
         private SqliteCommand _addComponentTypeCommand;
         private SqliteCommand _addAssetLocationCommand;
         private SqliteCommand _removeModAssetsCommand;
 
         private Dictionary<string, string> _componentIdCache;
 
-        public DatabaseWriter(string databasePath) : base(databasePath)
+        public CatalogueWriter(string databasePath) : base(databasePath)
         {
             CreateSQLCommands();
             _componentIdCache = new Dictionary<string, string>();
         }
 
-        public long InsertPropertyData(string componentType, string propertyName, bool isCollection = false, long collectionIndex = -1, string componentId = null)
+        public long InsertFieldData(string componentType, string fieldName, bool isCollection = false, long collectionIndex = -1, string componentId = null)
         {
             string trueComponentId;
             if (_componentIdCache.TryGetValue(componentType, out string id))
@@ -39,13 +38,13 @@ namespace DatabaseOps
             try
             {
                 _transaction = _db.BeginTransaction();
-                _addPropertyDataCommand.Transaction = _transaction;
-                _addPropertyDataCommand.Parameters["@component"].Value = trueComponentId;
-                _addPropertyDataCommand.Parameters["@property"].Value = propertyName;
-                _addPropertyDataCommand.Parameters["@collection"].Value = isCollection ? 1 : 0;
-                _addPropertyDataCommand.Parameters["@collection_idx"].Value = collectionIndex;
+                _addFieldDataCommand.Transaction = _transaction;
+                _addFieldDataCommand.Parameters["@component"].Value = trueComponentId;
+                _addFieldDataCommand.Parameters["@field"].Value = fieldName;
+                _addFieldDataCommand.Parameters["@collection"].Value = isCollection ? 1 : 0;
+                _addFieldDataCommand.Parameters["@collection_idx"].Value = collectionIndex;
 
-                var res = (long)_addPropertyDataCommand.ExecuteScalar();
+                var res = Convert.ToInt64(_addFieldDataCommand.ExecuteScalar());
                 _transaction.Commit();
                 return res;
             }
@@ -56,7 +55,7 @@ namespace DatabaseOps
             }
         }
 
-        public void InsertAsset(string modGuid, string assetPath, string assetGuid, string baseGameObject, string transformPath, long propertyDataId)
+        public void InsertAsset(string modGuid, string assetPath, string assetGuid, string baseGameObject, string transformPath, long fieldDataId)
         {
             try
             {
@@ -66,7 +65,7 @@ namespace DatabaseOps
                 _addModAssetCommand.Parameters["@source"].Value = modGuid;
                 _addModAssetCommand.Parameters["@name"].Value = assetPath;
                 _addModAssetCommand.Parameters["@location_id"].Value =
-                    InsertAssetLocation(baseGameObject, transformPath, propertyDataId);
+                    InsertAssetLocation(baseGameObject, transformPath, fieldDataId);
                 _addModAssetCommand.ExecuteNonQuery();
 
                 _transaction.Commit();
@@ -77,13 +76,13 @@ namespace DatabaseOps
             }
         }
 
-        private long InsertAssetLocation(string baseGameObject, string transformPath, long propertyDataId)
+        private long InsertAssetLocation(string baseGameObject, string transformPath, long fieldDataId)
         {
             _addAssetLocationCommand.Transaction = _transaction;
             _addAssetLocationCommand.Parameters["@gameobject"].Value = baseGameObject;
             _addAssetLocationCommand.Parameters["@path"].Value = transformPath;
-            _addAssetLocationCommand.Parameters["@prop_id"].Value = propertyDataId;
-            return (long)_addAssetLocationCommand.ExecuteScalar();
+            _addAssetLocationCommand.Parameters["@prop_id"].Value = fieldDataId;
+            return Convert.ToInt64(_addAssetLocationCommand.ExecuteScalar());
         }
 
         public string InsertComponentType(string typeName, string guid)
@@ -92,7 +91,7 @@ namespace DatabaseOps
             _addComponentTypeCommand.Transaction = _transaction;
             _addComponentTypeCommand.Parameters["@id"].Value = guid;
             _addComponentTypeCommand.Parameters["@type"].Value = typeName;
-            string res = (string)_addComponentTypeCommand.ExecuteScalar();
+            string res = Convert.ToString(_addComponentTypeCommand.ExecuteScalar());
             _transaction.Commit();
             return res; 
         }
@@ -121,17 +120,17 @@ namespace DatabaseOps
             _addComponentTypeCommand.Parameters.Add("@id", SqliteType.Text);
             _addComponentTypeCommand.Parameters.Add("@type", SqliteType.Text);
 
-            _addPropertyDataCommand = _db.CreateCommand();
-            _addPropertyDataCommand.CommandText =
-                "INSERT INTO property_data (component_id, property_name, is_collection, collection_index) VALUES (@component, @property, @collection, @collection_idx); SELECT last_insert_rowid();";
-            _addPropertyDataCommand.Parameters.Add("@component", SqliteType.Integer);
-            _addPropertyDataCommand.Parameters.Add("@property", SqliteType.Text);
-            _addPropertyDataCommand.Parameters.Add("@collection", SqliteType.Integer);
-            _addPropertyDataCommand.Parameters.Add("@collection_idx", SqliteType.Integer);
+            _addFieldDataCommand = _db.CreateCommand();
+            _addFieldDataCommand.CommandText =
+                "INSERT INTO field_data (component_id, field_name, is_collection, collection_index) VALUES (@component, @field, @collection, @collection_idx); SELECT last_insert_rowid();";
+            _addFieldDataCommand.Parameters.Add("@component", SqliteType.Integer);
+            _addFieldDataCommand.Parameters.Add("@field", SqliteType.Text);
+            _addFieldDataCommand.Parameters.Add("@collection", SqliteType.Integer);
+            _addFieldDataCommand.Parameters.Add("@collection_idx", SqliteType.Integer);
 
             _addAssetLocationCommand = _db.CreateCommand();
             _addAssetLocationCommand.CommandText =
-                "INSERT INTO asset_locations (base_gameobject, transform_path, property_id) VALUES (@gameobject, @path, @prop_id); SELECT last_insert_rowid();";
+                "INSERT INTO asset_locations (base_gameobject, transform_path, field_id) VALUES (@gameobject, @path, @prop_id); SELECT last_insert_rowid();";
             _addAssetLocationCommand.Parameters.Add("@gameobject", SqliteType.Text);
             _addAssetLocationCommand.Parameters.Add("@path", SqliteType.Text);
             _addAssetLocationCommand.Parameters.Add("@prop_id", SqliteType.Integer);

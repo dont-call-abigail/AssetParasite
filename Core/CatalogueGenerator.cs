@@ -1,34 +1,34 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using DatabaseOps;
+using AssetCatalogue.Database;
 
-namespace AssetManifest
+namespace AssetCatalogue
 {
-    public static class ManifestGenerator
+    public static class CatalogueGenerator
     {
-        private static DatabaseWriter _writer;
-        private static DatabaseReader _reader;
+        private static CatalogueWriter _writer;
+        private static CatalogueReader _reader;
 
-        public static DatabaseWriter Writer
+        public static CatalogueWriter Writer
         {
             get
             {
-                _writer ??= new DatabaseWriter(AssetParasite.Config.DatabasePath);
+                _writer ??= new CatalogueWriter(AssetParasite.Config.DatabasePath);
                 return _writer;
             }
         }
 
-        public static DatabaseReader Reader
+        public static CatalogueReader Reader
         {
             get
             {
-                _reader ??= new DatabaseReader(AssetParasite.Config.DatabasePath);
+                _reader ??= new CatalogueReader(AssetParasite.Config.DatabasePath);
                 return _reader;
             }
         }
     
-        public static void GenerateManifest(string[] assetGuids, List<AssetReferenceMap> assetRefMaps)
+        public static void GenerateCatalogue(string[] assetGuids, List<AssetReferenceMap> assetRefMaps)
         {
             if (AssetParasite.Config.FlushModAssets)
             {
@@ -38,7 +38,7 @@ namespace AssetManifest
             foreach (var guid in assetGuids)
             {
                 bool includedOnceFlag = false;
-                if (AssetParasite.Config.OnlyRegisterBasegameMatches && !Reader.EntryExistsForAssetId(guid, "basegame"))
+                if (AssetParasite.Config.OnlyRegisterBasegameMatches && !Reader.DependantExistsForAsset(guid, "basegame"))
                 {
                     if (AssetParasite.Config.VerboseLogging)
                     {
@@ -50,7 +50,7 @@ namespace AssetManifest
                 foreach (var referenceMap in assetRefMaps)
                 { 
                     if (!AssetParasite.Config.IncludeAllRefs && includedOnceFlag) break;
-                    includedOnceFlag = referenceMap.TryCreateManifestEntry(guid); 
+                    includedOnceFlag = referenceMap.TryCreateCatalogueEntry(guid); 
                 }
             }
             
@@ -58,16 +58,16 @@ namespace AssetManifest
             DestroyInterfaces();
         }
 
-        public static void GenerateAllAssetManifest(List<AssetReferenceMap> scenes)
+        public static void GenerateAllAssetCatalogue(List<AssetReferenceMap> scenes)
         {
-            GenerateManifest(scenes.Aggregate(Enumerable.Empty<string>(), 
+            GenerateCatalogue(scenes.Aggregate(Enumerable.Empty<string>(), 
                 (current, scene) => current.Union(scene.assetGuid2Component.Keys)).ToArray(), scenes);
         }
 
         public static void PopulateScriptIDs(string monoScriptsFolder)
         {
-            // NB: this system assumes that filename matches typename. also, unity only recognizes one
-            // MonoBehaviour/ScriptableObject declaration per file. so .meta files should have parity w/ Unity types
+            // NB: this system assumes that filename matches typename. since unity only recognizes one
+            // UnityEngine.Object declaration per file, .meta files *should* have parity w/ Unity types
 
             string[] metaFiles = Directory.GetFiles(monoScriptsFolder, "*.cs.meta", SearchOption.AllDirectories);
             for (int i = 0; i < metaFiles.Length; i++)

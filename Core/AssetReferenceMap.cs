@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using AssetManifest.Nodes;
+using AssetCatalogue.Nodes;
 
-namespace AssetManifest
+namespace AssetCatalogue
 {
     public class AssetReferenceMap
     {
@@ -22,7 +22,7 @@ namespace AssetManifest
             tsfmID2Transform = new Dictionary<long, TransformNode> { };
         }
     
-        public bool TryCreateManifestEntry(string guid)
+        public bool TryCreateCatalogueEntry(string guid)
         {
             if (!ContainsAsset(guid))
             {
@@ -49,7 +49,7 @@ namespace AssetManifest
                 var componentIdx = ResolveComponentData(foundRecord[0], component);
                 var hierarchyPath = ResolveHierarchyPath(component.GameObjectFileID);
 
-                ManifestGenerator.Writer.InsertAsset(AssetParasite.Config.ModGuid, assetName, guid, hierarchyPath.goName, hierarchyPath.tsfmPath,
+                CatalogueGenerator.Writer.InsertAsset(AssetParasite.Config.ModGuid, assetName, guid, hierarchyPath.goName, hierarchyPath.tsfmPath,
                     componentIdx);
 
                 if (!AssetParasite.Config.IncludeAllRefs) return true;
@@ -88,11 +88,11 @@ namespace AssetManifest
             long propId;
             if (component is MonoBehaviourNode scriptNode)
             {
-                propId = ManifestGenerator.Writer.InsertPropertyData(scriptNode.ComponentType, assetRef.MemberName, assetRef.IsCollection, assetRef.CollectionIndex, scriptNode.ScriptGUID);
+                propId = CatalogueGenerator.Writer.InsertFieldData(scriptNode.ComponentType, assetRef.FieldName, assetRef.IsCollection, assetRef.CollectionIndex, scriptNode.ScriptGUID);
             }
             else
             {
-                propId = ManifestGenerator.Writer.InsertPropertyData(component.ComponentType, assetRef.MemberName, assetRef.IsCollection, assetRef.CollectionIndex);
+                propId = CatalogueGenerator.Writer.InsertFieldData(component.ComponentType, assetRef.FieldName, assetRef.IsCollection, assetRef.CollectionIndex);
             }
         
             return propId;

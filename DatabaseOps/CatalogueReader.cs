@@ -3,16 +3,16 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Data.Sqlite;
 
-namespace DatabaseOps
+namespace AssetCatalogue.Database
 {
-    public class DatabaseReader : DatabaseInterface
+    public class CatalogueReader : DatabaseInterface
     {
         private SqliteTransaction _transaction;
         
         private SqliteCommand _getComponentTypeCommand;
         private SqliteCommand _entryExistsCommand;
         private SqliteCommand _getEntriesCommand;
-        private SqliteCommand _getMatchingAssetsCommand;
+        private SqliteCommand _getAssetLocationCommand;
 
         public class AssetLookupResult
         {
@@ -20,13 +20,13 @@ namespace DatabaseOps
             public string Guid;
             public string BaseGameObject;
             public int[] TransformPath;
-            public string Property;
+            public string Field;
             public bool IsCollection;
             public int CollectionIndex;
             public string ComponentType;
         }
 
-        public DatabaseReader(string databasePath) : base(databasePath)
+        public CatalogueReader(string databasePath) : base(databasePath)
         {
             CreateSQLCommands();
         }
@@ -41,7 +41,7 @@ namespace DatabaseOps
             return !string.IsNullOrEmpty(res) ? res : "MonoBehaviour";
         }
 
-        public bool EntryExistsForAssetId(string assetGuid, string source)
+        public bool DependantExistsForAsset(string assetGuid, string source)
         {
             _transaction = _db.BeginTransaction();
             _entryExistsCommand.Transaction = _transaction;
@@ -52,7 +52,7 @@ namespace DatabaseOps
             return res > 0;
         }
 
-        public string[] GetIdsForAsset(string assetName, string source)
+        public string[] GetDependencyIds(string assetName, string source)
         {
             _transaction = _db.BeginTransaction();
             _getEntriesCommand.Transaction = _transaction;
@@ -71,15 +71,15 @@ namespace DatabaseOps
             return results.ToArray();
         }
 
-        public AssetLookupResult[] GetAssetsWithId(string assetGuid, string source, int maxResults = 1)
+        public AssetLookupResult[] GetAssetInstanceLocations(string assetGuid, string source, int maxResults = 1)
         {
             _transaction = _db.BeginTransaction();
-            _getMatchingAssetsCommand.Transaction = _transaction;
-            _getMatchingAssetsCommand.Parameters["@guid"].Value = assetGuid;
-            _getMatchingAssetsCommand.Parameters["@source"].Value = source;
-            _getMatchingAssetsCommand.Parameters["@max"].Value = maxResults;
+            _getAssetLocationCommand.Transaction = _transaction;
+            _getAssetLocationCommand.Parameters["@guid"].Value = assetGuid;
+            _getAssetLocationCommand.Parameters["@source"].Value = source;
+            _getAssetLocationCommand.Parameters["@max"].Value = maxResults;
             var results = new AssetLookupResult[maxResults];
-            using (var reader = _getMatchingAssetsCommand.ExecuteReader())
+            using (var reader = _getAssetLocationCommand.ExecuteReader())
             {
                 for (int i = 0; i < results.Length; i++)
                 {
@@ -90,7 +90,7 @@ namespace DatabaseOps
                         Guid = reader.GetString(1),
                         BaseGameObject = reader.GetString(2),
                         TransformPath = ParseTransformPath(reader.GetString(3)),
-                        Property = reader.GetString(4),
+                        Field = reader.GetString(4),
                         IsCollection = reader.GetBoolean(5),
                         CollectionIndex = reader.GetInt32(6),
                         ComponentType = reader.GetString(7)
@@ -119,18 +119,18 @@ namespace DatabaseOps
             _entryExistsCommand.Parameters.Add("@asset_guid", SqliteType.Text);
             _entryExistsCommand.Parameters.Add("@source", SqliteType.Text);
 
-            _getMatchingAssetsCommand = _db.CreateCommand();
-            _getMatchingAssetsCommand.CommandText = 
+            _getAssetLocationCommand = _db.CreateCommand();
+            _getAssetLocationCommand.CommandText = 
                 @"SELECT assets.source, assets.asset_guid, asset_locations.base_gameobject, asset_locations.transform_path, 
-property_data.property_name, property_data.is_collection, property_data.collection_index, component_types.type FROM assets 
+field_data.field_name, field_data.is_collection, field_data.collection_index, component_types.type FROM assets 
 INNER JOIN asset_locations ON assets.location_id = asset_locations.id 
-INNER JOIN property_data ON asset_locations.property_id = property_data.id 
-INNER JOIN component_types ON property_data.component_id = component_types.id 
+INNER JOIN field_data ON asset_locations.field_id = field_data.id 
+INNER JOIN component_types ON field_data.component_id = component_types.id 
 
 WHERE assets.source = @source AND assets.asset_guid = @guid LIMIT @max;";
-            _getMatchingAssetsCommand.Parameters.Add("@source", SqliteType.Text);
-            _getMatchingAssetsCommand.Parameters.Add("@guid", SqliteType.Text);
-            _getMatchingAssetsCommand.Parameters.Add("@max", SqliteType.Integer);
+            _getAssetLocationCommand.Parameters.Add("@source", SqliteType.Text);
+            _getAssetLocationCommand.Parameters.Add("@guid", SqliteType.Text);
+            _getAssetLocationCommand.Parameters.Add("@max", SqliteType.Integer);
 
             _getEntriesCommand = _db.CreateCommand();
             _getEntriesCommand.CommandText =

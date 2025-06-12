@@ -2,7 +2,7 @@
 using System.Text;
 using VYaml.Parser;
 
-namespace AssetManifest.Parser
+namespace AssetCatalogue.Parser
 {
     public static class ParserExtensions
     {

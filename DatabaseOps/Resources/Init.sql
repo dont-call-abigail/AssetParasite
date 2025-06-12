@@ -4,10 +4,10 @@ CREATE TABLE "component_types" (
                                    PRIMARY KEY("id")
 );
 
-CREATE TABLE "property_data" (
+CREATE TABLE "field_data" (
 	"id"	INTEGER NOT NULL,
 	"component_id"	TEXT,
-	"property_name"	INTEGER,
+	"field_name"	INTEGER,
 	"is_collection"	INTEGER,
 	"collection_index"	INTEGER,
 	PRIMARY KEY("id" AUTOINCREMENT)
@@ -17,7 +17,7 @@ CREATE TABLE "asset_locations" (
     "id" INTEGER NOT NULL,
     "base_gameobject"	TEXT,
     "transform_path"	TEXT,
-    "property_id"	INTEGER,
+    "field_id"	INTEGER,
     PRIMARY KEY("id" AUTOINCREMENT)
 );
 

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace AssetManifest
+namespace AssetCatalogue
 {
     public class Logger
     {

@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
-using AssetManifest.Nodes;
+using AssetCatalogue.Nodes;
 using VYaml.Parser;
 
-namespace AssetManifest.Parser
+namespace AssetCatalogue.Parser
 {
     public class UnityAssetParser
     {
@@ -107,7 +107,7 @@ namespace AssetManifest.Parser
 
                     if (AssetParasite.Config.VerboseLogging)
                     {
-                        AssetParasite.Logger.WriteLine($"     FOUND: {assetRef.MemberName} @ {assetRef.Guid}");
+                        AssetParasite.Logger.WriteLine($"     FOUND: {assetRef.FieldName} @ {assetRef.Guid}");
                     }
                 }
             } 

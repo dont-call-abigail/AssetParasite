@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using AssetManifest.Parser;
+using AssetCatalogue.Parser;
 
-namespace AssetManifest
+namespace AssetCatalogue
 {
     public class AssetParasite
     {
@@ -88,10 +88,10 @@ namespace AssetManifest
                 }
             }
             
-            RunStandalone(assetFolderOrRegistryFile);
+            RunCatalogueStandalone(assetFolderOrRegistryFile);
         }
 
-        private static void RunStandalone(string assetFolderOrRegistryFile)
+        private static void RunCatalogueStandalone(string assetFolderOrRegistryFile)
         {
             RegisterMonoScripts();
             List<AssetReferenceMap> sceneAssets = new List<AssetReferenceMap>();
@@ -104,10 +104,10 @@ namespace AssetManifest
                 sceneAssets.Add(parser.BuildAssetReferenceMap());
             }
             
-            ManifestGenerator.GenerateAllAssetManifest(sceneAssets);
+            CatalogueGenerator.GenerateAllAssetCatalogue(sceneAssets);
         }
 
-        public static void GenerateManifest(IEnumerable<string> assetPaths, ParserConfig config)
+        public static void CatalogueAssets(IEnumerable<string> assetPaths, ParserConfig config)
         {
             Config = config;
             
@@ -122,13 +122,13 @@ namespace AssetManifest
                 sceneAssets.Add(parser.BuildAssetReferenceMap());
             }
             
-            ManifestGenerator.GenerateAllAssetManifest(sceneAssets);
+            CatalogueGenerator.GenerateAllAssetCatalogue(sceneAssets);
         }
 
-        public static void GenerateManifest(string assetFolder, ParserConfig config)
+        public static void CatalogueAssets(string assetFolder, ParserConfig config)
         {
             Config = config;
-            GenerateManifest(FetchAssetsFromSource(assetFolder), config);
+            CatalogueAssets(FetchAssetsFromSource(assetFolder), config);
         }
 
         static void RegisterMonoScripts()
@@ -136,7 +136,7 @@ namespace AssetManifest
             if (!string.IsNullOrEmpty(Config.MonoScriptsFolder))
             {
                 AssetParasite.Logger.WriteLine($"MonoScripts folder : {Config.MonoScriptsFolder}");
-                ManifestGenerator.PopulateScriptIDs(Config.MonoScriptsFolder);
+                CatalogueGenerator.PopulateScriptIDs(Config.MonoScriptsFolder);
             }
         }
 

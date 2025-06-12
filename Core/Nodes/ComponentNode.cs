@@ -1,22 +1,22 @@
 ﻿using System.Collections.Generic;
-using AssetManifest.Parser;
+using AssetCatalogue.Parser;
 using VYaml.Parser;
 
-namespace AssetManifest.Nodes
+namespace AssetCatalogue.Nodes
 {
     public class ComponentNode
     {
         public class AssetReference
         {
             public string Guid;
-            public string MemberName;
+            public string FieldName;
             public bool IsCollection;
             public int CollectionIndex;
 
-            public AssetReference(string guid, string memberName, bool isCollection, int collectionIndex)
+            public AssetReference(string guid, string fieldName, bool isCollection, int collectionIndex)
             {
                 Guid = guid;
-                MemberName = memberName;
+                FieldName = fieldName;
                 IsCollection = isCollection;
                 CollectionIndex = collectionIndex;
             }

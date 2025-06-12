@@ -7,10 +7,11 @@ This project empowers modders of Unity games to reference base game assets witho
 
 Given a selection of Unity yaml asset files, this tool will:
 - Find assets (materials, textures, etc) referenced within those files
-- Store the property information of the object containing the reference
+- Store the field information of the object containing the reference
 - Build a path from a root GameObject to the object containing the property, via Transform hierarchy
+And then stores all of the above information into an SQLite database.
 
-Using this data, you can assign asset references to your objects by grabbing a reference to the same asset from an object in the base game. It is meant for projects where base game assets are not otherwise accessible using AssetBundles.
+Using this data, you can assign asset references for your objects by grabbing a reference to the same asset from an object in the base game. It is meant for projects where base game assets are not otherwise accessible using AssetBundles.
 
 Prerequisites to make maximum use of this project:
 - Ripped base game assets in YAML form using [AssetRipper](https://github.com/AssetRipper/AssetRipper)
@@ -21,14 +22,14 @@ Prerequisites to make maximum use of this project:
 AssetParasite releases take two forms:
 - An executable for the YAML parser that produces the asset reference database. Runs on Windows, Linux, using .NET 8.
 - A folder containing DLLs for the AssetParasite, if you prefer a library to an executable. Targets .NET Standard 2.0 for compatibility with Unity 2020.3+.
-  - Of the DLLs, `DatabaseOps.dll` can be used over `AssetParasite.dll` if you only need to fetch manifest data (i.e. at game runtime)
+  - Of the DLLs, `AssetParasite.DatabaseOps.dll` can be used over `AssetParasite.Core.dll` if you only need to fetch manifest data (i.e. at game runtime)
 
 ## Usage
 You can provide a folder OR a path to a text file containing a list of asset paths.
 ```
 Usage: AssetParasite (asset folder|asset path list file) [options]
 Options:
--o, --output-file         Path to database file for catalog. Defaults to ""database.db"".
+-o, --output-file         Path to database file for catalogue database. Defaults to ""database.db"".
 -m, --mod-guid            Guid to identify this mod. If not provided, assets are presumed to belong to the base game.
 -f, --fresh               Clears the database entries for a given mod. Database path should be provided before this arg.
                               If a mod guid is not provided, all assets will be cleared.

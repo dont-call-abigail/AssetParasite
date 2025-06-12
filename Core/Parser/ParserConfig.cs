@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace AssetManifest.Parser
+namespace AssetCatalogue.Parser
 {
     public class ParserConfig
     {
@@ -23,10 +23,10 @@ namespace AssetManifest.Parser
         public string MonoScriptsFolder = null;
     
         public const int AnchorByteBufferSize = 20;  // a.k.a max character length of a long int
-        public const string HelpMessage = @"AssetParasite builds a manifest of referenced assets.
+        public const string HelpMessage = @"AssetParasite builds a SQLite database of assets and their dependencies.
 Usage: AssetParasite (asset folder|asset path list file) [options]
 Options:
--o, --output-file         Path to database file for catalog. Defaults to ""database.db"".
+-o, --output-file         Path to database file for catalogue database. Defaults to ""database.db"".
 -m, --mod-guid            Guid to identify this mod. If not provided, assets are presumed to belong to the base game.
 -f, --fresh               Clears the database entries for a given mod. Database path should be provided before this arg.
                               If a mod guid is not provided, all assets will be cleared.
