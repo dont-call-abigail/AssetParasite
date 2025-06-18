@@ -43,7 +43,8 @@ namespace AssetCatalogue
 
                 if (foundRecord.Count == 0)
                 {
-                    throw new Exception($"There are no assets for GUID {guid} in scene {assetName}");
+                    AssetParasite.Logger.WriteLine($"WARNING: There are no assets for GUID {guid} in scene {assetName}");
+                    return false;
                 }
 
                 var componentIdx = ResolveComponentData(foundRecord[0], component);

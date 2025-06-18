@@ -60,9 +60,8 @@ namespace AssetCatalogue.Parser
                                 assetMap.goID2Transform.Add(tsfm.GameObjectID, tsfm);
                                 break;
                             default:
-                                var cn = ComponentNode.ParseSelf(ref cursor, objectType);
+                                var cn = ComponentNode.ParseSelf(ref cursor, $"UnityEngine.{objectType}");
                                 RegisterComponentAssets(cn);
-                                // components without assets won't be ref'd after this point and will be GC'd
                                 break;
                         }
                     }

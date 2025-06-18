@@ -16,6 +16,7 @@ namespace AssetCatalogue.Database
 
         public class AssetLookupResult
         {
+            public string AssetName;
             public string Source;
             public string Guid;
             public string BaseGameObject;
@@ -78,28 +79,29 @@ namespace AssetCatalogue.Database
             _getAssetLocationCommand.Parameters["@guid"].Value = assetGuid;
             _getAssetLocationCommand.Parameters["@source"].Value = source;
             _getAssetLocationCommand.Parameters["@max"].Value = maxResults;
-            var results = new AssetLookupResult[maxResults];
+            var results = new List<AssetLookupResult>(maxResults);
             using (var reader = _getAssetLocationCommand.ExecuteReader())
             {
-                for (int i = 0; i < results.Length; i++)
+                for (int i = 0; i < results.Count; i++)
                 {
                     if (!reader.Read()) continue;
                     var nextResult = new AssetLookupResult
                     {
-                        Source = reader.GetString(0),
-                        Guid = reader.GetString(1),
-                        BaseGameObject = reader.GetString(2),
-                        TransformPath = ParseTransformPath(reader.GetString(3)),
-                        Field = reader.GetString(4),
-                        IsCollection = reader.GetBoolean(5),
-                        CollectionIndex = reader.GetInt32(6),
-                        ComponentType = reader.GetString(7)
+                        AssetName = reader.GetString(0),
+                        Source = reader.GetString(1),
+                        Guid = reader.GetString(2),
+                        BaseGameObject = reader.GetString(3),
+                        TransformPath = ParseTransformPath(reader.GetString(4)),
+                        Field = reader.GetString(5),
+                        IsCollection = reader.GetBoolean(6),
+                        CollectionIndex = reader.GetInt32(7),
+                        ComponentType = reader.GetString(8)
                     };
                     results[i] = nextResult;
                 }
             }
             _transaction.Commit();
-            return results;
+            return results.ToArray(); // will return array of null if no match
         }
 
         private int[] ParseTransformPath(string path)
@@ -121,7 +123,7 @@ namespace AssetCatalogue.Database
 
             _getAssetLocationCommand = _db.CreateCommand();
             _getAssetLocationCommand.CommandText = 
-                @"SELECT assets.source, assets.asset_guid, asset_locations.base_gameobject, asset_locations.transform_path, 
+                @"SELECT assets.asset_name, assets.source, assets.asset_guid, asset_locations.base_gameobject, asset_locations.transform_path, 
 field_data.field_name, field_data.is_collection, field_data.collection_index, component_types.type FROM assets 
 INNER JOIN asset_locations ON assets.location_id = asset_locations.id 
 INNER JOIN field_data ON asset_locations.field_id = field_data.id 

@@ -8,6 +8,9 @@
 //------------------------------------------------------------------------------
 
 namespace AssetCatalogue.Database {
+    using System;
+    
+    
     /// <summary>
     ///   A strongly-typed resource class, for looking up localized strings, etc.
     /// </summary>
@@ -35,7 +38,7 @@ namespace AssetCatalogue.Database {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("AssetManifest.Database.Resources", typeof(Resources).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("AssetCatalogue.Database.Resources", typeof(Resources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -63,10 +66,10 @@ namespace AssetCatalogue.Database {
         ///                                   PRIMARY KEY(&quot;id&quot;)
         ///);
         ///
-        ///CREATE TABLE &quot;property_data&quot; (
+        ///CREATE TABLE &quot;field_data&quot; (
         ///	&quot;id&quot;	INTEGER NOT NULL,
         ///	&quot;component_id&quot;	TEXT,
-        ///	&quot;property_name&quot;	INTEGER,
+        ///	&quot;field_name&quot;	INTEGER,
         ///	&quot;is_collection&quot;	INTEGER,
         ///	&quot;collection_index&quot;	INTEGER,
         ///	PRIMARY KEY(&quot;id&quot; AUTOINCREMENT)
@@ -75,7 +78,7 @@ namespace AssetCatalogue.Database {
         ///CREATE TABLE &quot;asset_locations&quot; (
         ///    &quot;id&quot; INTEGER NOT NULL,
         ///    &quot;base_gameobject&quot;	TEXT,
-        ///    [rest of string was truncated]&quot;;.
+        ///    &quot;tran [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string Init {
             get {
